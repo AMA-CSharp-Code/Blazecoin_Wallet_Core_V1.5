@@ -52,7 +52,7 @@ enum
     SER_GETHASH         = (1 << 2),
 };
 
-#define IMPLEMENT_SERIALIZE(statements)    \
+#define IMPLEMENT_SERIALIZE(...)    \
     unsigned int GetSerializeSize(int nType, int nVersion) const  \
     {                                           \
         CSerActionGetSerializeSize ser_action;  \
@@ -64,7 +64,7 @@ enum
         assert(fGetSize||fWrite||fRead); /* suppress warning */ \
         s.nType = nType;                        \
         s.nVersion = nVersion;                  \
-        {statements}                            \
+        { __VA_ARGS__ }                         \
         return nSerSize;                        \
     }                                           \
     template<typename Stream>                   \
@@ -76,7 +76,7 @@ enum
         const bool fRead = false;               \
         unsigned int nSerSize = 0;              \
         assert(fGetSize||fWrite||fRead); /* suppress warning */ \
-        {statements}                            \
+        { __VA_ARGS__ }                         \
     }                                           \
     template<typename Stream>                   \
     void Unserialize(Stream& s, int nType, int nVersion)  \
@@ -87,7 +87,7 @@ enum
         const bool fRead = true;                \
         unsigned int nSerSize = 0;              \
         assert(fGetSize||fWrite||fRead); /* suppress warning */ \
-        {statements}                            \
+        { __VA_ARGS__ }                         \
     }
 
 #define READWRITE(obj)      (nSerSize += ::SerReadWrite(s, (obj), nType, nVersion, ser_action))

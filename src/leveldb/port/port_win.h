@@ -32,9 +32,13 @@
 #define STORAGE_LEVELDB_PORT_PORT_WIN_H_
 
 #ifdef _MSC_VER
+#if _MSC_VER < 1900
 #define snprintf _snprintf
+#endif
 #define close _close
 #define fread_unlocked _fread_nolock
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
 #endif
 
 #include <string>

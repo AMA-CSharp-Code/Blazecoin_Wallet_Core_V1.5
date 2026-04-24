@@ -1,0 +1,77 @@
+# ---- Visual Studio / MSBuild ----
+.vs/
+obj/
+bin/
+*.user
+*.suo
+*.pdb
+*.ilk
+*.exp
+*.tlog
+*.cache
+*.idb
+*.iobj
+*.ipdb
+
+# ---- Build output / intermediates ----
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.exe
+*.dep
+*.Po
+Makefile
+Makefile.in
+.deps/
+
+# ---- Qt build ----
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+
+# ---- LevelDB / bundled deps intermediates ----
+src/leveldb/out-static/
+src/leveldb/out-shared/
+src/leveldb/build_config.mk
+
+# ---- Backup / scratch files ----
+*.backup
+*.bak
+*.orig
+*~
+*.swp
+
+# ---- Build diagnostics from the V1.5 compilation session ----
+build.log
+build[0-9]*.log
+dbgbuild.log
+build.utf8.log
+stdout.log
+
+# ---- Wallet runtime output (should never be in repo) ----
+wallet.dat
+debug.log
+db.log
+peers.dat
+blkindex.dat
+blocks/
+chainstate/
+database/
+
+# ---- Documents containing local filesystem paths or internal analysis ----
+Blazecoin_V2_Failure_Analysis.md
+
+# ---- OS noise ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Editor / local tooling ----
+.claude/
+.lock
+.vscode/
+.idea/

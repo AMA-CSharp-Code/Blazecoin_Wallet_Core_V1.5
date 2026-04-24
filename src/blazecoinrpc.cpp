@@ -33,7 +33,7 @@ using namespace json_spirit;
 static std::string strRPCUserColonPass;
 
 // These are created by StartRPCThreads, destroyed in StopRPCThreads
-static asio::io_service* rpc_io_service = NULL;
+static asio::io_context* rpc_io_service = NULL;
 static ssl::context* rpc_ssl_context = NULL;
 static boost::thread_group* rpc_worker_group = NULL;
 
@@ -359,7 +359,7 @@ static string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
             "HTTP/1.1 %d %s\r\n"
             "Date: %s\r\n"
             "Connection: %s\r\n"
-            "Content-Length: %"PRIszu"\r\n"
+            "Content-Length: %" PRIszu "\r\n"
             "Content-Type: application/json\r\n"
             "Server: blazecoin-json-rpc/%s\r\n"
             "\r\n"
@@ -543,15 +543,14 @@ bool ClientAllowed(const boost::asio::ip::address& address)
 {
     // Make sure that IPv4-compatible and IPv4-mapped IPv6 addresses are treated as IPv4 addresses
     if (address.is_v6()
-     && (address.to_v6().is_v4_compatible()
-      || address.to_v6().is_v4_mapped()))
-        return ClientAllowed(address.to_v6().to_v4());
+     && address.to_v6().is_v4_mapped())
+        return ClientAllowed(boost::asio::ip::make_address_v4(boost::asio::ip::v4_mapped, address.to_v6()));
 
     if (address == asio::ip::address_v4::loopback()
      || address == asio::ip::address_v6::loopback()
      || (address.is_v4()
          // Check whether IPv4 addresses match 127.0.0.0/8 (loopback subnet)
-      && (address.to_v4().to_ulong() & 0xff000000) == 0x7f000000))
+      && (address.to_v4().to_uint() & 0xff000000) == 0x7f000000))
         return true;
 
     const string strAddress = address.to_string();
@@ -594,19 +593,19 @@ public:
     }
     bool connect(const std::string& server, const std::string& port)
     {
-        ip::tcp::resolver resolver(stream.get_io_service());
-        ip::tcp::resolver::query query(server.c_str(), port.c_str());
-        ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-        ip::tcp::resolver::iterator end;
+        ip::tcp::resolver resolver(stream.get_executor());
         boost::system::error_code error = asio::error::host_not_found;
-        while (error && endpoint_iterator != end)
-        {
-            stream.lowest_layer().close();
-            stream.lowest_layer().connect(*endpoint_iterator++, error);
-        }
+        auto results = resolver.resolve(server, port, error);
         if (error)
             return false;
-        return true;
+        for (auto it = results.begin(); it != results.end(); ++it)
+        {
+            stream.lowest_layer().close();
+            stream.lowest_layer().connect(it->endpoint(), error);
+            if (!error)
+                return true;
+        }
+        return false;
     }
 
 private:
@@ -630,7 +629,7 @@ class AcceptedConnectionImpl : public AcceptedConnection
 {
 public:
     AcceptedConnectionImpl(
-            asio::io_service& io_service,
+            const asio::any_io_executor& io_service,
             ssl::context &context,
             bool fUseSSL) :
         sslStream(io_service, context),
@@ -681,7 +680,7 @@ static void RPCListen(boost::shared_ptr< basic_socket_acceptor<Protocol, SocketA
                    const bool fUseSSL)
 {
     // Accept connection
-    AcceptedConnectionImpl<Protocol>* conn = new AcceptedConnectionImpl<Protocol>(acceptor->get_io_service(), context, fUseSSL);
+    AcceptedConnectionImpl<Protocol>* conn = new AcceptedConnectionImpl<Protocol>(acceptor->get_executor(), context, fUseSSL);
 
     acceptor->async_accept(
             conn->sslStream.lowest_layer(),
@@ -766,8 +765,8 @@ void StartRPCThreads()
     }
 
     assert(rpc_io_service == NULL);
-    rpc_io_service = new asio::io_service();
-    rpc_ssl_context = new ssl::context(*rpc_io_service, ssl::context::sslv23);
+    rpc_io_service = new asio::io_context();
+    rpc_ssl_context = new ssl::context(ssl::context::sslv23);
 
     const bool fUseSSL = GetBoolArg("-rpcssl");
 
@@ -776,17 +775,17 @@ void StartRPCThreads()
         rpc_ssl_context->set_options(ssl::context::no_sslv2);
 
         filesystem::path pathCertFile(GetArg("-rpcsslcertificatechainfile", "server.cert"));
-        if (!pathCertFile.is_complete()) pathCertFile = filesystem::path(GetDataDir()) / pathCertFile;
+        if (!pathCertFile.is_absolute()) pathCertFile = filesystem::path(GetDataDir()) / pathCertFile;
         if (filesystem::exists(pathCertFile)) rpc_ssl_context->use_certificate_chain_file(pathCertFile.string());
         else printf("ThreadRPCServer ERROR: missing server certificate file %s\n", pathCertFile.string().c_str());
 
         filesystem::path pathPKFile(GetArg("-rpcsslprivatekeyfile", "server.pem"));
-        if (!pathPKFile.is_complete()) pathPKFile = filesystem::path(GetDataDir()) / pathPKFile;
+        if (!pathPKFile.is_absolute()) pathPKFile = filesystem::path(GetDataDir()) / pathPKFile;
         if (filesystem::exists(pathPKFile)) rpc_ssl_context->use_private_key_file(pathPKFile.string(), ssl::context::pem);
         else printf("ThreadRPCServer ERROR: missing server private key file %s\n", pathPKFile.string().c_str());
 
         string strCiphers = GetArg("-rpcsslciphers", "TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH");
-        SSL_CTX_set_cipher_list(rpc_ssl_context->impl(), strCiphers.c_str());
+        SSL_CTX_set_cipher_list(rpc_ssl_context->native_handle(), strCiphers.c_str());
     }
 
     // Try a dual IPv6/IPv4 socket, falling back to separate IPv4 and IPv6 sockets
@@ -807,7 +806,7 @@ void StartRPCThreads()
         acceptor->set_option(boost::asio::ip::v6_only(loopback), v6_only_error);
 
         acceptor->bind(endpoint);
-        acceptor->listen(socket_base::max_connections);
+        acceptor->listen(socket_base::max_listen_connections);
 
         RPCListen(acceptor, *rpc_ssl_context, fUseSSL);
 
@@ -829,7 +828,7 @@ void StartRPCThreads()
             acceptor->open(endpoint.protocol());
             acceptor->set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
             acceptor->bind(endpoint);
-            acceptor->listen(socket_base::max_connections);
+            acceptor->listen(socket_base::max_listen_connections);
 
             RPCListen(acceptor, *rpc_ssl_context, fUseSSL);
 
@@ -849,7 +848,7 @@ void StartRPCThreads()
 
     rpc_worker_group = new boost::thread_group();
     for (int i = 0; i < GetArg("-rpcthreads", 4); i++)
-        rpc_worker_group->create_thread(boost::bind(&asio::io_service::run, rpc_io_service));
+        rpc_worker_group->create_thread(boost::bind(&asio::io_context::run, rpc_io_service));
 }
 
 void StopRPCThreads()
@@ -1068,8 +1067,8 @@ Object CallRPC(const string& strMethod, const Array& params)
 
     // Connect to localhost
     bool fUseSSL = GetBoolArg("-rpcssl");
-    asio::io_service io_service;
-    ssl::context context(io_service, ssl::context::sslv23);
+    asio::io_context io_service;
+    ssl::context context(ssl::context::sslv23);
     context.set_options(ssl::context::no_sslv2);
     asio::ssl::stream<asio::ip::tcp::socket> sslStream(io_service, context);
     SSLIOStreamDevice<asio::ip::tcp> d(sslStream, fUseSSL);

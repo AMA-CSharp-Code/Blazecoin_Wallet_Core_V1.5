@@ -258,7 +258,7 @@ namespace json_spirit
     template< class Config >
     Value_impl< Config >::Value_impl( int value )
     :   type_( int_type )
-    ,   v_( static_cast< boost::int64_t >( value ) )
+    ,   v_( Variant( static_cast< boost::int64_t >( value ) ) )
     ,   is_uint64_( false )
     {
     }
@@ -266,7 +266,7 @@ namespace json_spirit
     template< class Config >
     Value_impl< Config >::Value_impl( boost::int64_t value )
     :   type_( int_type )
-    ,   v_( value )
+    ,   v_( Variant( value ) )
     ,   is_uint64_( false )
     {
     }
@@ -274,7 +274,7 @@ namespace json_spirit
     template< class Config >
     Value_impl< Config >::Value_impl( boost::uint64_t value )
     :   type_( int_type )
-    ,   v_( static_cast< boost::int64_t >( value ) )
+    ,   v_( Variant( static_cast< boost::int64_t >( value ) ) )
     ,   is_uint64_( true )
     {
     }
@@ -282,7 +282,7 @@ namespace json_spirit
     template< class Config >
     Value_impl< Config >::Value_impl( double value )
     :   type_( real_type )
-    ,   v_( value )
+    ,   v_( Variant( value ) )
     ,   is_uint64_( false )
     {
     }
