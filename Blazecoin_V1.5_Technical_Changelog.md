@@ -1,14 +1,23 @@
 # Blazecoin V1.5 — Complete Changelog vs Original (0.8.6.2)
 
-**Generated:** 2026-04-24
+**Generated:** 2026-04-24 — last updated 2026-04-26
 **Scope:** Every source-level change made to the Blazecoin codebase between the original wpstudio/blazecoin 0.8.6.2 release and the compiled, running V1.5 binary.
-**Validated against:** Production chain via sync test. Genesis hash matches; 500K checkpoint matches; syncing past original V2.0 failure point.
+**Validated against:** Production chain via sync test. Genesis hash matches; checkpoints 500K through 4M all match; daemon (blazecoind.exe) and GUI (blazecoin-qt.exe) both build cleanly on MSVC 2022 / Qt 5.15 / vcpkg.
+
+## Revision history
+
+| Date | Section | Change |
+|------|---------|--------|
+| 2026-04-24 | (initial) | First version after V1.5 daemon was built and validated to 500K |
+| 2026-04-26 | §1, §2.2, §2.3, §9 | Corrected attribution: 0.8.6.2 syncs fine; the 2M stall was V2.0 specific |
+| 2026-04-26 | §9 | Added 1M / 1.5M / 2M / 2.5M / 3M / 4M checkpoint match results |
+| 2026-04-26 | §13 (new), §6, §7, §9 | Added Qt 5.15 GUI build (blazecoin-qt.exe) and per-version data-dir change |
 
 ---
 
 ## 1. Overview
 
-V1.5 is a minimal-change modernization of the working 0.8.6.2 codebase. **The original 0.8.6.2 wallet syncs the full chain successfully** — the production node has been running continuously since 2014 and is currently at the chain tip. The motivation for V1.5 was the failed **V2.0** rebase (Bitcoin Core 28.0 base), which stalled at block ~2,000,000 due to issues documented separately in the V2.0 failure analysis. V1.5 returns to the proven 0.8.6.2 base and adds a small set of forward-looking safeguards plus the toolchain work needed to keep building it in 2026.
+V1.5 is a minimal-change modernization of the working 0.8.6.2 codebase. **The original 0.8.6.2 wallet syncs the full chain successfully** — the production node has been running continuously since 2014 and is currently at the chain tip. The motivation for V1.5 was the failed **V2.0** rebase (Bitcoin Core 28.0 base), which stalled at block ~2,000,000 due to issues documented separately in the V2.0 failure analysis. V1.5 returns to the proven 0.8.6.2 base and adds a small set of forward-looking safeguards plus the toolchain work needed to keep building it in 2026. Both the headless daemon (`blazecoind.exe`) and the Qt GUI wallet (`blazecoin-qt.exe`) build cleanly, retaining the original single-binary, retro-style architecture.
 
 V1.5 contains three distinct categories of change:
 
@@ -301,14 +310,15 @@ Other `assert(obj.IsValid())`, `assert(container.count(...))`, and `assert(bool_
 
 ## 8. Files changed (summary)
 
-### Source files
+### Core / daemon source files
 
 ```
 src/bignum.h              CBigNum class + serialization overloads
 src/base58.h              BN_div / BN_mul call sites
 src/compat.h              SOCKET, ssize_t typedefs
 src/util.h                __PRETTY_FUNCTION__, PRI64 spacing
-src/util.cpp              clang workaround removed; PRI64 spacing; is_absolute
+src/util.cpp              clang workaround removed; PRI64 spacing; is_absolute;
+                          GetDefaultDataDir -> %APPDATA%\BlazecoinV1.5 (per-version isolation)
 src/serialize.h           IMPLEMENT_SERIALIZE variadic
 src/key.cpp               OpenSSL 3.x migration; NDEBUG fix
 src/crypter.cpp           EVP_CIPHER_CTX heap alloc
@@ -330,11 +340,36 @@ src/checkpoints.cpp       extended checkpoint table (V1.5 feature)
 src/clientversion.h       1.5.0.0 (V1.5 feature)
 ```
 
-### Project file
+### Qt GUI source files (new in 2026-04-26 changes)
+
+```
+src/qt/blazecoin.cpp           QApplication name -> Blazecoin-Qt-V1.5 (separate QSettings)
+src/qt/addressbookpage.cpp     setResizeMode -> setSectionResizeMode (Qt 5 rename)
+src/qt/overviewpage.cpp        setResizeMode -> setSectionResizeMode
+src/qt/blazecoingui.cpp        QSound stub (moved to QtMultimedia which we don't link);
+                               QDesktopServices::storageLocation -> QStandardPaths::writableLocation;
+                               added QStandardPaths include
+src/qt/clientmodel.cpp         using namespace boost::placeholders (Boost 1.66+)
+src/qt/walletmodel.cpp         using namespace boost::placeholders
+src/qt/locale/blazecoin_*.qm   47 zero-byte placeholders so rcc can embed the
+                               resource without lrelease (qt5-tools not installed)
+```
+
+### Project / build files
 
 ```
 Blazecoin.vcxproj         include paths, library list, ObjectFileName, excluded c.cc
+blazecoin-qt.pro          MSVC-aware: gated GCC-only flags, MSVC defines
+                          (NOMINMAX etc.), vcpkg boost suffix, MSVC LevelDB
+                          inline-source block, removed CODECFORTR, gated
+                          mingwthrd to MinGW only, skipped lrelease on MSVC,
+                          object_parallel_to_source for bloom.obj collision
+.gitignore                added Qt build artifacts (.qmake.stash, build/,
+                          release/, blazecoin-qt.vcxproj{,.filters},
+                          qtbuild*.log, rebuild-*.log)
 ```
+
+`blazecoin-qt.vcxproj` itself is **not tracked** — it's regenerated by `qmake` and contains machine-specific paths.
 
 ---
 
@@ -353,9 +388,29 @@ Blazecoin.vcxproj         include paths, library list, ObjectFileName, excluded 
 | 2M hash matches production checkpoint *(the V2.0 failure point)* | Pass — `4ceca77d22d672d391670224ca2f9457209bc1ecf5f5eaf5e9d652b81656995b` |
 | 2.5M hash matches production checkpoint | Pass — `a6c937fcf01c04eb3aa7a8e06c80acb80e6843acd268fb6d520c5dad6194e7db` |
 | 3M hash matches production checkpoint | Pass — `1af43523e055656cae5e3b6894d4484b968c25ddf7adbd758e5908e45e38fdf0` |
-| Sync to tip (~4.1M) | **In progress** at time of writing |
-| Cross-version peer test: stock 0.8.6.2 syncs from V1.5 to tip | **Pending** (after V1.5 reaches tip) |
+| 3.5M hash matches production checkpoint | Pass — `f637143b959c511cd0e4d3df7859181f1e5633ca2460f270eb02d4903846e04f` |
+| 4M hash matches production checkpoint | Pass — `959ec2a6d7d67cf4272bcb6508c68daa69a7c280123f26d001c47387186fc1fd` |
+| Sync to tip (~4.1M) | Pass — V1.5 reached `4,105,596` matching peers |
+| Cross-version peer test: stock 0.8.6.2 binary syncs from V1.5 | Started — handshake confirmed (test peer received `/BlazecoinFoundation:1.5.0/` version message and accepted V1.5 as syncnode); test paused at ~107K blocks for resumption later |
 | RPC commands respond | Pass — `getblockcount`, `getconnectioncount`, `getinfo`, `getblockhash`, etc. |
+| `blazecoin-qt.exe` (GUI) builds and links | Pass — 4.5 MB binary at `release/blazecoin-qt.exe` |
+| GUI defaults to `%APPDATA%\BlazecoinV1.5\` | Pass — daemon and GUI both honor the per-version path |
+
+---
+
+## 9.1 Per-version data-directory isolation
+
+Both `blazecoind.exe` and `blazecoin-qt.exe` now default to a V1.5-specific data directory so they never collide with the production 0.8.6.2 wallet's storage:
+
+| Platform | Before | After |
+|----------|--------|-------|
+| Windows | `%APPDATA%\Blazecoin\` | `%APPDATA%\BlazecoinV1.5\` |
+| macOS | `~/Library/Application Support/Blazecoin/` | `~/Library/Application Support/BlazecoinV1.5/` |
+| Unix | `~/.blazecoin/` | `~/.blazecoinv1.5/` |
+
+Implemented in `src/util.cpp` `GetDefaultDataDir()`. Users who pass an explicit `-datadir=...` are unaffected.
+
+The Qt application name was also bumped from `Blazecoin-Qt` to `Blazecoin-Qt-V1.5` (`src/qt/blazecoin.cpp`) so V1.5's `QSettings` (window geometry, options dialog state, etc.) live in a separate registry/INI group from the production wallet.
 
 ---
 
@@ -382,9 +437,9 @@ Tested and confirmed working with:
 
 - Visual Studio 2022 Community, MSVC v14.50
 - Windows 11 Pro (SDK 10.0.26100)
-- vcpkg (x64-windows triplet): boost 1.90 + foreach + signals2 + iostreams + interprocess, openssl 3.6.2, berkeley-db 4.8, miniupnpc, leveldb (bundled)
+- vcpkg (x64-windows triplet): boost 1.90 + foreach + signals2 + iostreams + interprocess, openssl 3.6.2, berkeley-db 4.8, miniupnpc, leveldb (bundled), **qt5-base 5.15.18**
 
-Build command:
+### Daemon build
 
 ```
 msbuild Blazecoin.sln /p:Configuration=Release /p:Platform=x64 /m
@@ -392,10 +447,50 @@ msbuild Blazecoin.sln /p:Configuration=Release /p:Platform=x64 /m
 
 Output: `bin\x64\Release\blazecoind.exe` (~1.8 MB).
 
+### GUI build (added 2026-04-26)
+
+Run from a 64-bit VS Developer Command Prompt:
+
+```
+qmake -tp vc -spec win32-msvc blazecoin-qt.pro \
+    BOOST_INCLUDE_PATH=C:/vcpkg/installed/x64-windows/include \
+    BOOST_LIB_PATH=C:/vcpkg/installed/x64-windows/lib \
+    BDB_INCLUDE_PATH=C:/vcpkg/installed/x64-windows/include \
+    BDB_LIB_PATH=C:/vcpkg/installed/x64-windows/lib \
+    OPENSSL_INCLUDE_PATH=C:/vcpkg/installed/x64-windows/include \
+    OPENSSL_LIB_PATH=C:/vcpkg/installed/x64-windows/lib \
+    USE_UPNP=- USE_QRCODE=0 USE_IPV6=1
+```
+
+Then patch the toolset (qmake emits `v143`, this machine has `v145`):
+
+```
+sed -i 's/<PlatformToolset>v143<\/PlatformToolset>/<PlatformToolset>v145<\/PlatformToolset>/g' blazecoin-qt.vcxproj
+```
+
+And patch `<ObjectFileName>build\</ObjectFileName>` to `<ObjectFileName>$(IntDir)%(RelativeDir)</ObjectFileName>` to prevent `bloom.obj` collision between `src/bloom.cpp` and `src/leveldb/util/bloom.cc`.
+
+```
+msbuild blazecoin-qt.vcxproj /p:Configuration=Release /p:Platform=x64 /m
+```
+
+Output: `release\blazecoin-qt.exe` (~4.5 MB). Runtime requires Qt 5 DLLs and vcpkg DLLs on `PATH`:
+
+```
+$env:PATH = "C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\tools\qt5\bin;" + $env:PATH
+.\release\blazecoin-qt.exe
+```
+
+The GUI defaults to `%APPDATA%\BlazecoinV1.5\` (see § 9.1).
+
 ---
 
 ## 12. Known follow-ups
 
-- Sync to ~4.1M tip is in progress; results at milestone heights 1M, 2M, 3M, 4M should be hash-verified against production.
-- `blazecoin-qt.exe` (GUI build) has not been rebuilt or validated in this session — only the `blazecoind` daemon.
-- The V1.5 daemon currently shares some cryptographic code with the original 0.8.6.2; an eventual V2.0 rebase on a newer Bitcoin Core version (~0.16 or 0.18) is recommended for long-term security maintenance, starting from this V1.5 stable base.
+- **Cross-version peer test** paused at ~107K blocks. Resume by relaunching the test peer (stock 0.8.6.2 from `C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe`) with `-datadir=C:\blazecoin-data\TestPeer`. It will continue downloading from V1.5 toward 4.1M tip.
+- **Sanitize local paths** in `MSYS2-Setup-QuickStart.md` and `OPENSSL_COMPATIBILITY_ISSUE.md` (a few `C:\Users\Andrew\...` strings) if the repo is ever made public.
+- **Translation files** (`src/qt/locale/*.qm`) are committed as zero-byte placeholders. To regenerate real translations, install vcpkg's `qt5-tools` and re-run `qmake` without the `!win32-msvc*` guard around the `lrelease` block in `blazecoin-qt.pro`.
+- **`USE_UPNP` in the GUI build** is currently disabled (the bundled `net.cpp` UPNP code uses an older miniupnpc API). The daemon build also doesn't define it. Re-enable by updating the `upnpDiscover()` and `UPNP_GetValidIGD()` call sites to the modern signatures.
+- **`USE_QRCODE`** disabled — receive-address QR codes aren't built. Add `qrencode` to vcpkg and pass `USE_QRCODE=1` to qmake to re-enable.
+- **`QSound`** sound notifications on incoming transactions disabled (`src/qt/blazecoingui.cpp:856`). To re-enable: add `qt5-multimedia` and switch to `QSoundEffect`.
+- **Long-term:** V2.0 should be an incremental Bitcoin Core rebase (e.g. 0.8 → 0.12 → 0.16 → 0.21 → 28.x) using V1.5 as the proven baseline rather than the failed jump-to-28.0 attempt.
