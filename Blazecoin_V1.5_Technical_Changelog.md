@@ -8,19 +8,23 @@
 
 ## 1. Overview
 
-V1.5 has two distinct sets of changes:
+V1.5 is a minimal-change modernization of the working 0.8.6.2 codebase. **The original 0.8.6.2 wallet syncs the full chain successfully** — the production node has been running continuously since 2014 and is currently at the chain tip. The motivation for V1.5 was the failed **V2.0** rebase (Bitcoin Core 28.0 base), which stalled at block ~2,000,000 due to issues documented separately in the V2.0 failure analysis. V1.5 returns to the proven 0.8.6.2 base and adds a small set of forward-looking safeguards plus the toolchain work needed to keep building it in 2026.
+
+V1.5 contains three distinct categories of change:
 
 | Category | Purpose | Risk |
 |----------|---------|------|
-| **Feature changes** | Fix the sync wall at block 2,000,000 that blocked new installations | Designed to be consensus-compatible; validated by hash match |
-| **Toolchain changes** | Make the 2013-era code compile under MSVC 2022 / OpenSSL 3.x / Boost 1.90 | Required extensive API migration; no functional changes |
-| **Latent bug fixes** | Fix pre-existing bugs in the original code that only surface in Release + OpenSSL 3.x | Repairs silently-broken behavior inherited from upstream |
+| **Feature additions** | Proactive checkpoints up to 4M and raised header-request cap (50M); future-proofing as the chain keeps growing — *not* required to sync the current chain | Designed to be consensus-compatible; validated by hash match through 3M+ |
+| **Toolchain changes** | Make the 2013-era code compile under MSVC 2022 / OpenSSL 3.x / Boost 1.90; the original toolchain is no longer obtainable | Required extensive API migration; no functional changes |
+| **Latent bug fixes** | Fix pre-existing bugs in the original code that only surface in Release builds + OpenSSL 3.x | Repairs silently-broken behavior inherited from upstream |
 
 Consensus rules, wire protocol, `wallet.dat` format, P2P ports, and magic bytes are **unchanged**.
 
 ---
 
-## 2. Feature changes (the reason V1.5 exists)
+## 2. Feature changes
+
+These are the project-intent changes — modest, forward-looking additions on top of the working 0.8.6.2 baseline.
 
 ### 2.1 Version bump
 
@@ -37,13 +41,20 @@ Wallet now reports: `Blazecoin version v1.5.0.0-<commit>-beta`.
 
 **File:** `src/main.cpp`
 
-The peer-to-peer header request loop was capped such that it refused to request more headers once the chain exceeded ~2,000,000 blocks. At 30-second block intervals, Blazecoin's chain produces ~1M blocks/year, so by 2016 the cap made fresh installs impossible to fully sync.
+The peer-to-peer header request loop had an upper bound around 2,000,000. The original 0.8.6.2 wallet still syncs the current ~4.1M-block chain successfully, so this limit is not a hard sync barrier in 0.8.6.2. The change to 50,000,000 is a defensive future-proofing edit — at Blazecoin's 30-second block interval (~1M blocks/year), bumping the ceiling now removes any chance of it becoming a real limit during the lifetime of V1.5.
 
 ### 2.3 Checkpoints added up to block 4,000,000
 
 **File:** `src/checkpoints.cpp`
 
 Checkpoints are trusted "this block at this height is definitely valid" markers. Original code had checkpoints up to block 363,120 (from 2014). V1.5 adds checkpoints every 500K blocks through 4,000,000, plus original intermediate markers. Expected hashes were extracted from the running production daemon via `Get-CheckpointHashes.ps1`.
+
+Benefits of the new checkpoints:
+- Faster initial sync (less work validating signatures up to each checkpoint)
+- Defense against deep-reorg attacks that try to rewrite history before a checkpoint
+- A built-in verification mechanism — if a peer feeds us a different chain, we reject at the next checkpoint
+
+The original 0.8.6.2 syncs without these and produces an identical canonical chain; the checkpoints just make new V1.5 installs faster and more robust.
 
 Full checkpoint list is in `Blazecoin_V1.5_Checkpoints.txt`.
 
@@ -335,11 +346,15 @@ Blazecoin.vcxproj         include paths, library list, ObjectFileName, excluded 
 | Wallet keypool generates distinct keys | Pass |
 | Connects to seed nodes | Pass — `91.206.16.214`, `85.15.179.171` |
 | Genesis block hash matches production | Pass — `5d871c1b6ea542c2bb8a3b3ac70028a591bbf81369e90c2446c1a2bbfb89459b` |
-| 500K block hash matches production checkpoint | Pass — `9b6f14f13f0ee345eb03aa2742630480d7e2f7c3ce46e4c34ecbb23d2d871f6c` |
-| Sync past original V2.0 failure point (block 70) | Pass (after NDEBUG fixes) |
-| Sync past 500K | Pass |
-| Sync past 2M (the V1.5 target) | **Pending** — at time of writing, sync is in progress |
-| Sync to tip (~4.1M) | **Pending** |
+| Sync past block 70 (first non-coinbase tx) | Pass — required NDEBUG fixes (see § 7) |
+| 500K hash matches production checkpoint | Pass — `9b6f14f13f0ee345eb03aa2742630480d7e2f7c3ce46e4c34ecbb23d2d871f6c` |
+| 1M hash matches production checkpoint | Pass — `2f1c4d32c87f0e77a63fc4cb902223307cf3b3c867818fa45f1bc7fef60d2686` |
+| 1.5M hash matches production checkpoint | Pass — `44a971426d30eb1446086b1319979edcf73536897efb04505782da3760be4809` |
+| 2M hash matches production checkpoint *(the V2.0 failure point)* | Pass — `4ceca77d22d672d391670224ca2f9457209bc1ecf5f5eaf5e9d652b81656995b` |
+| 2.5M hash matches production checkpoint | Pass — `a6c937fcf01c04eb3aa7a8e06c80acb80e6843acd268fb6d520c5dad6194e7db` |
+| 3M hash matches production checkpoint | Pass — `1af43523e055656cae5e3b6894d4484b968c25ddf7adbd758e5908e45e38fdf0` |
+| Sync to tip (~4.1M) | **In progress** at time of writing |
+| Cross-version peer test: stock 0.8.6.2 syncs from V1.5 to tip | **Pending** (after V1.5 reaches tip) |
 | RPC commands respond | Pass — `getblockcount`, `getconnectioncount`, `getinfo`, `getblockhash`, etc. |
 
 ---

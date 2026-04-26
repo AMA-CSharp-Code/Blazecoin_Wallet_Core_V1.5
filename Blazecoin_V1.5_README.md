@@ -1,5 +1,7 @@
 # Blazecoin Core V1.5 - Quick Start Guide
 
+> **Note (corrected 2026-04-26):** This document was written during initial V1.5 planning, on the assumption that 0.8.6.2 (the production wallet) had a sync stall around block 2,000,000. Subsequent verification showed that 0.8.6.2 syncs the full ~4.1M-block chain without issue — the production node has been running continuously since 2014. The 2M-block stall was specific to the failed **V2.0** attempt (Bitcoin Core 28.0 base), which motivated V1.5's creation. V1.5's actual contributions are: modern toolchain compatibility (MSVC 2022 / OpenSSL 3.x / Boost 1.90), latent NDEBUG/assert bug fixes inherited from upstream, and proactive checkpoint + header-limit additions for future chain growth. The "2M sync wall" wording below should be read in that corrected context. See `Blazecoin_V1.5_Technical_Changelog.md` for the accurate post-build account.
+
 ## What This Is
 This folder contains everything you need to upgrade Blazecoin Core wallet to fix the blockchain sync issue beyond 2,000,000 blocks.
 
