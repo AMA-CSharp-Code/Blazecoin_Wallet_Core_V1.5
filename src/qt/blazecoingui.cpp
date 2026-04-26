@@ -73,8 +73,12 @@
 #include <QDesktopWidget>
 #include <QListWidget>
 #include <QPainter>
-#include <QSound>
+// QSound moved to QtMultimedia in Qt 5; stubbed out for now (incoming-tx ding disabled)
+//#include <QSound>
 #include <QSizeGrip>
+#if QT_VERSION >= 0x050000
+#include <QStandardPaths>
+#endif
 
 #include <iostream>
 
@@ -853,7 +857,7 @@ void BlazecoinGUI::incomingTransaction(const QModelIndex& parent, int start, int
             QString strWavPath = QString::fromStdString(wavPath.string());
             if (!QFile::exists(strWavPath))
                 QFile::copy(":/res/incom.wav", strWavPath);
-            QSound::play(strWavPath);
+            // QSound::play(strWavPath);  // TODO: re-enable via QtMultimedia or QSoundEffect
         }
     }
 
@@ -1233,7 +1237,11 @@ void BlazecoinGUI::encryptWallet(bool status)
 
 void BlazecoinGUI::backupWallet()
 {
+#if QT_VERSION < 0x050000
     QString saveDir = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+#else
+    QString saveDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+#endif
     QString filename = QFileDialog::getSaveFileName(this, tr("Backup Wallet"), saveDir, tr("Wallet Data (*.dat)"));
     if(!filename.isEmpty()) {
         if(!walletModel->backupWallet(filename)) {

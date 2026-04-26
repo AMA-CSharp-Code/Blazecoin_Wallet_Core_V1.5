@@ -6,6 +6,13 @@ INCLUDEPATH += src src/json src/qt /usr/include/miniupnpc
 QT += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+# MSVC needs these to match the Blazecoin.vcxproj daemon build
+win32-msvc* {
+    DEFINES += NOMINMAX _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS _SCL_SECURE_NO_WARNINGS _WIN32_WINNT=0x0601
+    # Place object files in subdirs that mirror their source path so src/bloom.cpp and
+    # src/leveldb/util/bloom.cc don't collide on bloom.obj
+    CONFIG += object_parallel_to_source
+}
 CONFIG += no_include_pwd
 CONFIG += thread
 
@@ -36,19 +43,20 @@ contains(RELEASE, 1) {
     }
 }
 
-!win32 {
+!win32:!*msvc* {
     # for extra security against potential buffer overflows: enable GCCs Stack Smashing Protection
     QMAKE_CXXFLAGS *= -fstack-protector-all
     QMAKE_LFLAGS *= -fstack-protector-all
-    # Exclude on Windows cross compile with MinGW 4.2.x, as it will result in a non-working executable!
-    # This can be enabled for Windows, when we switch to MinGW >= 4.4.x.
 }
-# for extra security (see: https://wiki.debian.org/Hardening): this flag is GCC compiler-specific
-QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2
-# for extra security on Windows: enable ASLR and DEP via GCC linker flags
-win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
-# on Windows: enable GCC large address aware linker flag
-win32:QMAKE_LFLAGS *= -Wl,--large-address-aware
+# GCC-only hardening flags
+!*msvc* {
+    QMAKE_CXXFLAGS *= -D_FORTIFY_SOURCE=2
+}
+# MinGW-only linker flags (MSVC has /DYNAMICBASE /NXCOMPAT /LARGEADDRESSAWARE on by default)
+win32-g++ {
+    QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
+    QMAKE_LFLAGS *= -Wl,--large-address-aware
+}
 
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
@@ -100,24 +108,69 @@ contains(BLAZECOIN_NEED_QT_PLUGINS, 1) {
 }
 
 INCLUDEPATH += src/leveldb/include src/leveldb/helpers
-LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
-!win32 {
-    # we use QMAKE_CXXFLAGS_RELEASE even without RELEASE=1 because we use RELEASE to indicate linking preferences not -O preferences
-    genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a
-} else {
-    # make an educated guess about what the ranlib command is called
-    isEmpty(QMAKE_RANLIB) {
-        QMAKE_RANLIB = $$replace(QMAKE_STRIP, strip, ranlib)
-    }
+
+win32-msvc* {
+    # MSVC: compile LevelDB sources directly (same set as Blazecoin.vcxproj)
+    INCLUDEPATH += src/leveldb
+    DEFINES += LEVELDB_PLATFORM_WINDOWS OS_WIN
+    SOURCES += \
+        src/leveldb/db/builder.cc \
+        src/leveldb/db/dbformat.cc \
+        src/leveldb/db/db_impl.cc \
+        src/leveldb/db/db_iter.cc \
+        src/leveldb/db/filename.cc \
+        src/leveldb/db/log_reader.cc \
+        src/leveldb/db/log_writer.cc \
+        src/leveldb/db/memtable.cc \
+        src/leveldb/db/repair.cc \
+        src/leveldb/db/table_cache.cc \
+        src/leveldb/db/version_edit.cc \
+        src/leveldb/db/version_set.cc \
+        src/leveldb/db/write_batch.cc \
+        src/leveldb/table/block.cc \
+        src/leveldb/table/block_builder.cc \
+        src/leveldb/table/filter_block.cc \
+        src/leveldb/table/format.cc \
+        src/leveldb/table/iterator.cc \
+        src/leveldb/table/merger.cc \
+        src/leveldb/table/table.cc \
+        src/leveldb/table/table_builder.cc \
+        src/leveldb/table/two_level_iterator.cc \
+        src/leveldb/util/arena.cc \
+        src/leveldb/util/bloom.cc \
+        src/leveldb/util/cache.cc \
+        src/leveldb/util/coding.cc \
+        src/leveldb/util/comparator.cc \
+        src/leveldb/util/crc32c.cc \
+        src/leveldb/util/env.cc \
+        src/leveldb/util/env_win.cc \
+        src/leveldb/util/filter_policy.cc \
+        src/leveldb/util/hash.cc \
+        src/leveldb/util/histogram.cc \
+        src/leveldb/util/logging.cc \
+        src/leveldb/util/options.cc \
+        src/leveldb/util/status.cc \
+        src/leveldb/port/port_win.cc \
+        src/leveldb/helpers/memenv/memenv.cc
     LIBS += -lshlwapi
-    genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libleveldb.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libmemenv.a
+} else {
+    # MinGW / Unix: build via make as before
+    LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
+    !win32 {
+        genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a
+    } else {
+        isEmpty(QMAKE_RANLIB) {
+            QMAKE_RANLIB = $$replace(QMAKE_STRIP, strip, ranlib)
+        }
+        LIBS += -lshlwapi
+        genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libleveldb.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libmemenv.a
+    }
+    genleveldb.target = $$PWD/src/leveldb/libleveldb.a
+    genleveldb.depends = FORCE
+    PRE_TARGETDEPS += $$PWD/src/leveldb/libleveldb.a
+    QMAKE_EXTRA_TARGETS += genleveldb
+    QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) clean
 }
-genleveldb.target = $$PWD/src/leveldb/libleveldb.a
-genleveldb.depends = FORCE
-PRE_TARGETDEPS += $$PWD/src/leveldb/libleveldb.a
-QMAKE_EXTRA_TARGETS += genleveldb
-# Gross ugly hack that depends on qmake internals, unfortunately there is no other way to do it.
-QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) clean
 
 # regenerate src/build.h
 !win32|contains(USE_BUILD_INFO, 1) {
@@ -129,7 +182,10 @@ QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) cl
     DEFINES += HAVE_BUILD_INFO
 }
 
-QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+# GCC-style warning flags — only if we're on g++/MinGW
+*g++*|*clang* {
+    QMAKE_CXXFLAGS_WARN_ON = -fdiagnostics-show-option -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter -Wstack-protector
+}
 
 # Input
 DEPENDPATH += src src/json src/qt
@@ -343,25 +399,28 @@ QMAKE_EXTRA_COMPILERS += gccsse2
 SOURCES_SSE2 += src/scrypt-sse2.cpp
 }
 
-# Todo: Remove this line when switching to Qt5, as that option was removed
-CODECFORTR = UTF-8
+# CODECFORTR was removed in Qt 5
+lessThan(QT_MAJOR_VERSION, 5): CODECFORTR = UTF-8
 
 # for lrelease/lupdate
 # also add new translations to src/qt/blazecoin.qrc under translations/
-TRANSLATIONS = $$files(src/qt/locale/blazecoin_*.ts)
+# Translations require lrelease (qt5-tools). Skipped on win32-msvc to avoid that dependency.
+!win32-msvc* {
+    TRANSLATIONS = $$files(src/qt/locale/blazecoin_*.ts)
 
-isEmpty(QMAKE_LRELEASE) {
-    win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
-    else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+    isEmpty(QMAKE_LRELEASE) {
+        win32:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\\lrelease.exe
+        else:QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+    }
+    isEmpty(QM_DIR):QM_DIR = $$PWD/src/qt/locale
+    # automatically build translations, so they can be included in resource file
+    TSQM.name = lrelease ${QMAKE_FILE_IN}
+    TSQM.input = TRANSLATIONS
+    TSQM.output = $$QM_DIR/${QMAKE_FILE_BASE}.qm
+    TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
+    TSQM.CONFIG = no_link
+    QMAKE_EXTRA_COMPILERS += TSQM
 }
-isEmpty(QM_DIR):QM_DIR = $$PWD/src/qt/locale
-# automatically build translations, so they can be included in resource file
-TSQM.name = lrelease ${QMAKE_FILE_IN}
-TSQM.input = TRANSLATIONS
-TSQM.output = $$QM_DIR/${QMAKE_FILE_BASE}.qm
-TSQM.commands = $$QMAKE_LRELEASE ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
-TSQM.CONFIG = no_link
-QMAKE_EXTRA_COMPILERS += TSQM
 
 # "Other files" to show in Qt Creator
 OTHER_FILES += README.md \
@@ -377,7 +436,9 @@ OTHER_FILES += README.md \
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
     macx:BOOST_LIB_SUFFIX = -mt
-    win32:BOOST_LIB_SUFFIX = -mgw48-mt-s-1_55
+    win32-g++:BOOST_LIB_SUFFIX = -mgw48-mt-s-1_55
+    # vcpkg + MSVC convention
+    win32-msvc*:BOOST_LIB_SUFFIX = -vc145-mt-x64-1_90
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
@@ -407,13 +468,9 @@ isEmpty(BOOST_INCLUDE_PATH) {
 win32:DEFINES += WIN32 WIN32_LEAN_AND_MEAN
 win32:RC_FILE = src/qt/res/blazecoin-qt.rc
 
-win32:!contains(MINGW_THREAD_BUGFIX, 0) {
-    # At least qmake's win32-g++-cross profile is missing the -lmingwthrd
-    # thread-safety flag. GCC has -mthreads to enable this, but it doesn't
-    # work with static linking. -lmingwthrd must come BEFORE -lmingw, so
-    # it is prepended to QMAKE_LIBS_QT_ENTRY.
-    # It can be turned off with MINGW_THREAD_BUGFIX=0, just in case it causes
-    # any problems on some untested qmake profile now or in the future.
+win32-g++:!contains(MINGW_THREAD_BUGFIX, 0) {
+    # MinGW only — adds the missing thread-safety lib to qmake's win32-g++-cross profile.
+    # MSVC handles threading natively; mingwthrd.lib does not exist there.
     DEFINES += _MT
     QMAKE_LIBS_QT_ENTRY = -lmingwthrd $$QMAKE_LIBS_QT_ENTRY
 }
@@ -439,12 +496,24 @@ macx:QMAKE_INFO_PLIST = share/qt/Info.plist
 # Set libraries and includes at end, to use platform-defined defaults if not overridden
 INCLUDEPATH += $$BOOST_INCLUDE_PATH $$BDB_INCLUDE_PATH $$OPENSSL_INCLUDE_PATH $$QRENCODE_INCLUDE_PATH
 LIBS += $$join(BOOST_LIB_PATH,,-L,) $$join(BDB_LIB_PATH,,-L,) $$join(OPENSSL_LIB_PATH,,-L,) $$join(QRENCODE_LIB_PATH,,-L,)
-LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
-# -lgdi32 has to happen after -lcrypto (see  #681)
-win32:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
-LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
-win32:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
-macx:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
+
+win32-msvc* {
+    # vcpkg MSVC builds: libssl.lib / libcrypto.lib / libdb48.lib (boost_system is header-only since 1.69)
+    LIBS += -llibssl -llibcrypto -llibdb48
+    LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32 -liphlpapi
+    LIBS += -lboost_filesystem$$BOOST_LIB_SUFFIX \
+            -lboost_program_options$$BOOST_LIB_SUFFIX \
+            -lboost_thread$$BOOST_THREAD_LIB_SUFFIX \
+            -lboost_chrono$$BOOST_LIB_SUFFIX \
+            -lboost_iostreams$$BOOST_LIB_SUFFIX
+} else {
+    LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
+    # -lgdi32 has to happen after -lcrypto (see  #681)
+    win32:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
+    LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
+    win32:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
+    macx:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
+}
 
 contains(RELEASE, 1) {
     !win32:!macx {
@@ -453,4 +522,4 @@ contains(RELEASE, 1) {
     }
 }
 
-system($$QMAKE_LRELEASE -silent $$TRANSLATIONS)
+!win32-msvc*: system($$QMAKE_LRELEASE -silent $$TRANSLATIONS)

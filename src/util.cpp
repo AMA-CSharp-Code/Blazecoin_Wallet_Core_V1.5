@@ -1021,13 +1021,14 @@ void PrintExceptionContinue(std::exception* pex, const char* pszThread)
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Blazecoin
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Blazecoin
-    // Mac: ~/Library/Application Support/Blazecoin
-    // Unix: ~/.blazecoin
+    // V1.5: per-version data directory so V1.5 / V2.0 / production wallets
+    // can coexist without corrupting each other's chainstate / wallet.dat.
+    // Windows: C:\Users\Username\AppData\Roaming\BlazecoinV1.5
+    // Mac:     ~/Library/Application Support/BlazecoinV1.5
+    // Unix:    ~/.blazecoinv1.5
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Blazecoin";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "BlazecoinV1.5";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -1039,10 +1040,10 @@ boost::filesystem::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     fs::create_directory(pathRet);
-    return pathRet / "Blazecoin";
+    return pathRet / "BlazecoinV1.5";
 #else
     // Unix
-    return pathRet / ".blazecoin";
+    return pathRet / ".blazecoinv1.5";
 #endif
 #endif
 }

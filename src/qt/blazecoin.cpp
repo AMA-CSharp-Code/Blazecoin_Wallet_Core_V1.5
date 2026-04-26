@@ -150,12 +150,13 @@ int main(int argc, char *argv[])
 
     // Application identification (must be set before OptionsModel is initialized,
     // as it is used to locate QSettings)
+    // V1.5: separate QSettings group from production wallet
     QApplication::setOrganizationName("Blazecoin");
     QApplication::setOrganizationDomain("blazecoinfoundation.org");
     if(GetBoolArg("-testnet", false)) // Separate UI settings for testnet
-        QApplication::setApplicationName("Blazecoin-Qt-testnet");
+        QApplication::setApplicationName("Blazecoin-Qt-V1.5-testnet");
     else
-        QApplication::setApplicationName("Blazecoin-Qt");
+        QApplication::setApplicationName("Blazecoin-Qt-V1.5");
 
     // ... then GUI settings:
     OptionsModel optionsModel;
