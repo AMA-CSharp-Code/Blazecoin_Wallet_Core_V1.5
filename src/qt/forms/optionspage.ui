@@ -171,7 +171,7 @@
    <item>
     <widget class="Line" name="lineBeforeAddressBook_5">
      <property name="styleSheet">
-      <string notr="true">background-color: #0052AE;</string>
+      <string notr="true">background-color: #d80317;</string>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
@@ -199,7 +199,9 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">#wServiceMessagesHeader_4 {
+	background-color: black;
+}</string>
      </property>
      <property name="is_header" stdset="0">
       <bool>true</bool>
@@ -262,7 +264,7 @@
         </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
-	color: #D8DFE9;
+	color: #FFFFFF;
 }</string>
         </property>
         <property name="text">
@@ -277,17 +279,19 @@
     <widget class="QWidget" name="wContainer" native="true">
      <property name="styleSheet">
       <string notr="true">#wContainer {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
 }
 
 QLabel {
-	color: #D8DFE9;
+	color: #FFFFFF;
 }
 
 /* =========== CheckBox ==============*/
 QCheckBox {
     spacing: 5px;
-	color: #0052AE;
+	color: #FFFFFF;
+	padding: 1px 0;
+	min-height: 14px;
 }
 
 QCheckBox::indicator {
@@ -365,7 +369,7 @@ QCheckBox::indicator:checked:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
             </property>
             <property name="text">
@@ -521,7 +525,7 @@ QCheckBox::indicator:checked:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
             </property>
             <property name="text">
@@ -754,11 +758,11 @@ QCheckBox::indicator:checked:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
             </property>
             <property name="text">
-             <string>Pay transaction fee</string>
+             <string>Pay Optional Transaction Fee</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -810,7 +814,7 @@ QCheckBox::indicator:checked:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
             </property>
             <property name="text">
@@ -1214,7 +1218,7 @@ QCheckBox::indicator:checked:pressed {
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -1224,11 +1228,11 @@ QCheckBox::indicator:checked:pressed {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #0099CC;
+	background-color: #d80317;
 }</string>
           </property>
           <property name="text">
@@ -1265,7 +1269,7 @@ QPushButton:pressed:flat {
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -1275,11 +1279,11 @@ QPushButton:pressed:flat {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #0099CC;
+	background-color: #d80317;
 }</string>
           </property>
           <property name="text">

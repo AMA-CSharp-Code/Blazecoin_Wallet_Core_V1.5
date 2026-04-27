@@ -201,6 +201,11 @@
        <height>32</height>
       </size>
      </property>
+     <property name="styleSheet">
+      <string notr="true">#wHeader {
+	background-color: black;
+}</string>
+     </property>
      <property name="is_header" stdset="0">
       <bool>true</bool>
      </property>

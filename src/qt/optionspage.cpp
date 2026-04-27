@@ -94,9 +94,6 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     connect(mapper, SIGNAL(currentIndexChanged(int)), this, SLOT(disableApplyButton()));
     /* setup/change UI elements when proxy IP is invalid/valid */
     connect(this, SIGNAL(proxyIpValid(QValidatedLineEdit *, bool)), this, SLOT(handleProxyIpValid(QValidatedLineEdit *, bool)));
-
-    showNotification(ui->verticalLayout, 2,
-                     tr("Optional transaction fee per kB that helps make sure your transactions are processed quickly. Fee 0.01 recommended."), true);
 }
 
 OptionsDialog::~OptionsDialog()

@@ -36,8 +36,8 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget *parent) :
             ui->passLabel1->hide();
             ui->passEdit1->hide();
             ui->warningLabel->setText(tr("Enter the new passphrase to the wallet.<br/>Please use a passphrase of <b>10 or more random characters</b>, or <b>eight or more words</b>."));
-            ui->lbTitle->setText(tr("Encrypt wallet"));
-            setWindowTitle(tr("Encrypt wallet"));
+            ui->lbTitle->setText(tr("Encrypt Wallet"));
+            setWindowTitle(tr("Encrypt Wallet"));
             break;
         case Unlock: // Ask passphrase
             ui->warningLabel->setText(tr("This operation needs your wallet passphrase to unlock the wallet."));
