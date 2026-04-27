@@ -19,7 +19,7 @@
 }
 
 QDialog {
-	background-color: rgb(0, 82, 174);
+	background-color: rgb(0, 0, 0);
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -69,7 +69,7 @@ QDialog {
         </property>
         <property name="styleSheet">
          <string notr="true">#wCaption {
-	background-color:  rgb(0, 82, 174);
+	background-color: rgb(0, 0, 0);
 }</string>
         </property>
         <property name="is_header" stdset="0">
@@ -164,7 +164,7 @@ QDialog {
            </property>
            <property name="styleSheet">
             <string notr="true">QLabel {
-	color: #E9D9D8;
+	color: #FFFFFF;
 }</string>
            </property>
            <property name="text">
@@ -187,16 +187,25 @@ QDialog {
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QPushButton {	
-	image: url(:/res/close_normal.png);
+            <string notr="true">QPushButton {
+	background-color: transparent;
+	background-image: url(:/res/close_normal.png);
+	background-repeat: no-repeat;
+	background-position: center;
 	border: 0px solid gray;
 }
 QPushButton:pressed:flat {
-	image: url(:/res/close_normal.png);
+	background-color: #FF1A2E;
+	background-image: url(:/res/close_normal.png);
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 QPushButton:hover {
-	image: url(:/res/close_hover.png);
+	background-color: #d80317;
+	background-image: url(:/res/close_normal.png);
+	background-repeat: no-repeat;
+	background-position: center;
 }</string>
            </property>
            <property name="text">

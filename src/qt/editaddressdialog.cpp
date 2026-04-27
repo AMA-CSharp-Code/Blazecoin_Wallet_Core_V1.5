@@ -23,8 +23,8 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
     switch(mode)
     {
     case NewReceivingAddress:
-        ui->lbTitle->setText(tr("New receiving address"));
-        setWindowTitle(tr("New receiving address"));
+        ui->lbTitle->setText(tr("New Receiving Address"));
+        setWindowTitle(tr("New Receiving Address"));
         ui->addressEdit->setEnabled(false);
         ui->pasteButton->setEnabled(false);
         ui->picEdit->setVisible(false);
@@ -37,8 +37,8 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
         ui->picAdd->setVisible(true);
         break;
     case EditReceivingAddress:
-        ui->lbTitle->setText(tr("Edit receiving address"));
-        setWindowTitle(tr("Edit receiving address"));
+        ui->lbTitle->setText(tr("Edit Receiving Address"));
+        setWindowTitle(tr("Edit Receiving Address"));
         ui->addressEdit->setEnabled(false);
         ui->pasteButton->setEnabled(false);
         ui->picEdit->setVisible(true);

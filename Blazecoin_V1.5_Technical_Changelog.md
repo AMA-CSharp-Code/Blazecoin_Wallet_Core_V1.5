@@ -15,6 +15,8 @@
 | 2026-04-27 | §9.2 (new) | Added RPC throughput benchmark — V1.5 is 5–11 % faster than stock 0.8.6.2 |
 | 2026-04-27 | §13.1 (new), §8 | Mining page rework: layout converted to QHBoxLayout/QVBoxLayout, Speed moved into header, slider gains thread-count readout + 75 % danger-zone warning, slider max capped at cores − 1, Win 7+ `GetActiveProcessorCount` for >64-core boxes |
 | 2026-04-27 | §13.2 (new), §8 | Qt GUI visual redesign: tiled phoenix-coin wallpaper (cached `QPixmap` painted in `BlazecoinGUI::paintEvent` below the 127 px main header), main-window logo coin recomposited, semi-transparent black panels (`rgba(0,0,0,180)`) replace light-blue containers across overview / mining / send / receive / address book / sign / verify / encrypt / about / transactions, red `#d80317` accent lines + button hovers, white text throughout, network connection icons recolored red, address-book table styled (transparent items, `rgba(255,255,255,30)` alternate rows, left-aligned via model `Qt::TextAlignmentRole`) |
+| 2026-04-27 | §13.4 (new), §13.5 (new) | EditAddress dialog dark-mode finish: outer `QDialog` and `wCaption` switched from blue `rgb(0, 82, 174)` to black, `picEdit` and `picAdd` indicator icons recoloured red, "Receiving Address" capitalisation; close X recipe rewritten to `background-image:` + `background-color:` so the red hover overlay paints below the white X glyph (the QSS `image:` property paints in a different z-order and was being covered by `background-color:`). |
+| 2026-04-27 | §13.6 (new) | Build-system note: MSBuild's custom-build step does not reliably re-invoke `rcc` when only a referenced PNG changes — it tracks the `.qrc` and the input PNG list snapshot, but timestamp updates inside an unchanged-list PNG are missed. Cure is to run `rcc.exe` by hand (one invocation per `.qrc` — `res.qrc` and `blazecoin.qrc` are separate compilation units that must not collide on `-o`). |
 
 ---
 
@@ -636,11 +638,94 @@ src/qt/res/connection_{1..5}.png  recoloured red (alpha preserved)
 src/qt/res/last_transactions.png  recoloured red (kept for non-header uses)
 ```
 
-**Build note:** the Qt resource compiler (`rcc`) is not triggered by changes to PNG
-files referenced in `res.qrc` — only by changes to `res.qrc` itself. After
-modifying any embedded resource without changing the .qrc, run
-`touch src/qt/res.qrc` (or delete `build/release/qrc_blazecoin.obj`) before
-rebuilding so the embedded copy is refreshed.
+### 13.4 EditAddress dialog dark finish
+
+- Outer `QDialog` and inner `wCaption` (the title strip) bg both swapped from
+  blue `rgb(0, 82, 174)` to black `rgb(0, 0, 0)`. The caption "Edit record" /
+  "Add record" label flipped from pinkish `#E9D9D8` to white.
+- `picEdit` (`edit_record_icon.png`) and `picAdd` (`add_record_icon.png`) — the
+  small mode-indicator icons next to the title — recoloured red `#d80317`
+  with the per-pixel Color.FromArgb(p.A, R, G, B) trick that keeps the
+  alpha mask. Originals saved as `.bak` siblings.
+- Title text capitalised: "New receiving address" → "New Receiving Address",
+  "Edit receiving address" → "Edit Receiving Address" (in
+  `editaddressdialog.cpp`, both `lbTitle->setText` and `setWindowTitle` calls).
+  Sending-mode counterparts deliberately left lowercase per the request.
+
+### 13.5 Close button (X) hover recipe
+
+The close-X button (`bClose`) appears on every dialog in the wallet and was
+the most stubborn part of the redesign. Final working recipe in
+`editaddressdialog.ui`:
+
+```css
+QPushButton {
+    background-color: transparent;
+    background-image: url(:/res/close_normal.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 0px solid gray;
+}
+QPushButton:hover {
+    background-color: #d80317;
+    background-image: url(:/res/close_normal.png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+QPushButton:pressed:flat {
+    background-color: #FF1A2E;
+    background-image: url(:/res/close_normal.png);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+```
+
+Why `background-image` and not `image`. With the `image:` QSS property,
+QPushButton paints the icon **before** the `background-color`, so the
+`background-color: #d80317` on hover ended up painted *over* the white X —
+producing a solid red square with no glyph. Switching to `background-image`
+moves the X into the background layer, where `background-color` is the
+**bottom** colour and `background-image` the layer above it; the result is
+white X on top of red. `close_normal.png` is now the only state image —
+white X on transparent — and the hover red comes purely from
+`background-color`.
+
+### 13.6 Build-system note: rcc and the two `.qrc` files
+
+`blazecoin-qt` uses **two** Qt resource files:
+
+| `.qrc` | Generates | Contents |
+|--------|-----------|----------|
+| `src/qt/blazecoin.qrc` | `release/qrc_blazecoin.cpp` | Splash screens, app icons, locale `.qm` files |
+| `src/qt/res.qrc` | `release/qrc_res.cpp` | All dialog images / styled-button icons / wallpaper |
+
+MSBuild's CustomBuild step **only re-invokes `rcc` when the `.qrc` itself
+changes** — modifying a PNG referenced by an unchanged `.qrc` does *not*
+re-trigger generation, even if you `touch src/qt/res.qrc` afterwards (the
+dependency snapshot is at the inputs-list level, not file timestamps). The
+result is that the embedded resource silently stays at the version baked
+into the existing generated `.cpp`.
+
+Reliable workflow when only PNGs change:
+
+```bash
+"/c/vcpkg/installed/x64-windows/tools/qt5/bin/rcc.exe" -name res \
+    src/qt/res.qrc -o release/qrc_res.cpp
+rm -f build/release/qrc_res.obj
+"/c/Program Files/Microsoft Visual Studio/.../MSBuild.exe" blazecoin-qt.vcxproj \
+    /p:Configuration=Release /p:Platform=x64 /m /t:Build
+```
+
+**Critical pitfall:** the two `.qrc` files compile to *different* `.cpp`
+filenames — running `rcc -name blazecoin src/qt/res.qrc -o
+release/qrc_blazecoin.cpp` (the wrong `-o`) will silently overwrite the
+splash/icon `.cpp` with `res.qrc` content and produce a broken splash. The
+`-name` and `-o` arguments must match the `.qrc`'s natural pair:
+
+| `.qrc` | `-name` | `-o` |
+|--------|---------|------|
+| `blazecoin.qrc` | `blazecoin` | `release/qrc_blazecoin.cpp` |
+| `res.qrc` | `res` | `release/qrc_res.cpp` |
 
 ---
 
