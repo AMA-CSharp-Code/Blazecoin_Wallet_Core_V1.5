@@ -334,9 +334,9 @@ void RPCConsole::clear()
                 "table { }"
                 "td.time { color: #808080; padding-top: 3px; } "
                 "td.message { font-family: Monospace; font-size: 12px; } "
-                "td.cmd-request { color: #590607; } "
+                "td.cmd-request { color: #FF6B6B; } "
                 "td.cmd-error { color: red; } "
-                "b { color: #590607; } "
+                "b { color: #FF6B6B; } "
                 );
 
     message(CMD_REPLY, (tr("Welcome to the Blazecoin RPC console.") + "<br>" +

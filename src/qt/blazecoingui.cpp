@@ -42,6 +42,9 @@
 #include <QBrush>
 #include <QPixmap>
 
+#include <fstream>
+#include <boost/filesystem.hpp>
+
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
@@ -373,6 +376,8 @@ void BlazecoinGUI::createActions(bool fIsTestnet)
     encryptWalletAction->setCheckable(true);
     backupWalletAction = new QAction(QIcon(":/icons/filesave"), tr("&Backup Wallet..."), this);
     backupWalletAction->setStatusTip(tr("Backup wallet to another location"));
+    importWalletAction = new QAction(QIcon(":/icons/filesave"), tr("&Import Wallet..."), this);
+    importWalletAction->setStatusTip(tr("Replace the current wallet.dat with one from a backup (applied at next startup)"));
     changePassphraseAction = new QAction(QIcon(":/icons/key"), tr("&Change Passphrase..."), this);
     changePassphraseAction->setStatusTip(tr("Change the passphrase used for wallet encryption"));
     signMessageAction = new QAction(QIcon(":/icons/edit"), tr("Sign &Message..."), this);
@@ -393,6 +398,7 @@ void BlazecoinGUI::createActions(bool fIsTestnet)
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(encryptWalletAction, SIGNAL(triggered(bool)), this, SLOT(encryptWallet(bool)));
     connect(backupWalletAction, SIGNAL(triggered()), this, SLOT(backupWallet()));
+    connect(importWalletAction, SIGNAL(triggered()), this, SLOT(importWallet()));
     connect(changePassphraseAction, SIGNAL(triggered()), this, SLOT(changePassphrase()));
     connect(signMessageAction, SIGNAL(triggered()), this, SLOT(gotoSignMessageTab()));
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(gotoVerifyMessageTab()));
@@ -411,6 +417,7 @@ void BlazecoinGUI::createMenuBar()
     // Configure the menus
     QMenu *file = appMenuBar->addMenu(tr("&File"));
     file->addAction(backupWalletAction);
+    file->addAction(importWalletAction);
     file->addAction(exportAction);
     file->addAction(signMessageAction);
     file->addAction(verifyMessageAction);
@@ -1088,6 +1095,7 @@ void BlazecoinGUI::menuFileRequested()
     QAction* home = menu.addAction(tr("&Overview").remove('&'));
     QAction* messages = menu.addAction(tr("Service Messages"));
     QAction* qaBackupWallet = menu.addAction(tr("Backup Wallet"));
+    QAction* qaImportWallet = menu.addAction(tr("Import Wallet"));
     QAction* exportData = menu.addAction(tr("&Export...").remove('&').remove("..."));
     QAction* exitApp = menu.addAction(QIcon("://res/menu/menu_exit.png"), tr("E&xit").remove('&'));
 
@@ -1105,6 +1113,9 @@ void BlazecoinGUI::menuFileRequested()
     }
     else if (selected == qaBackupWallet) {
         this->backupWallet();
+    }
+    else if (selected == qaImportWallet) {
+        this->importWallet();
     }
     else if (selected == exportData)
     {
@@ -1272,6 +1283,61 @@ void BlazecoinGUI::backupWallet()
             message(tr("Backup Successful"), tr("The wallet data was successfully saved to the new location."),
                       CClientUIInterface::MSG_INFORMATION);
     }
+}
+
+void BlazecoinGUI::importWallet()
+{
+    // Berkeley DB has wallet.dat locked while the wallet is running, so we
+    // can't swap it in place safely. Instead: write a marker file with the
+    // chosen source path next to the data dir, then close the application.
+    // On next startup, init.cpp's "wallet import" step (just before
+    // bitdb.Open) backs up the current wallet, copies the new one in, clears
+    // the marker, and proceeds normally.
+#if QT_VERSION < 0x050000
+    QString openDir = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+#else
+    QString openDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+#endif
+    QString filename = QFileDialog::getOpenFileName(this, tr("Import Wallet"), openDir, tr("Wallet Data (*.dat)"));
+    if (filename.isEmpty())
+        return;
+
+    QFileInfo srcInfo(filename);
+    if (!srcInfo.exists() || !srcInfo.isFile() || srcInfo.size() < 1024) {
+        message(tr("Import Failed"), tr("The selected file is not a valid wallet.dat."),
+                CClientUIInterface::MSG_ERROR);
+        return;
+    }
+
+    QMessageBox::StandardButton confirm = QMessageBox::warning(this,
+        tr("Import Wallet"),
+        tr("This will replace the current wallet.dat with:\n\n%1\n\n"
+           "Your existing wallet.dat will be saved as wallet.dat.bak.<timestamp> "
+           "in the data directory.\n\n"
+           "The wallet will close now. The import is applied on next startup.\n\n"
+           "Continue?").arg(filename),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (confirm != QMessageBox::Yes)
+        return;
+
+    // Write the marker into the data dir so init.cpp can find it on next start.
+    boost::filesystem::path markerPath = GetDataDir() / "wallet-import-pending.txt";
+    try {
+        std::ofstream out(markerPath.string().c_str(), std::ios::out | std::ios::trunc);
+        if (!out) throw std::runtime_error("cannot open marker for write");
+        out << filename.toStdString();
+        out.close();
+    } catch (const std::exception &e) {
+        message(tr("Import Failed"),
+                tr("Could not stage the import marker:\n%1").arg(QString::fromStdString(e.what())),
+                CClientUIInterface::MSG_ERROR);
+        return;
+    }
+
+    message(tr("Import Staged"),
+        tr("The wallet will now close. Restart Blazecoin to complete the import."),
+        CClientUIInterface::MSG_INFORMATION);
+    qApp->quit();
 }
 
 void BlazecoinGUI::changePassphrase()

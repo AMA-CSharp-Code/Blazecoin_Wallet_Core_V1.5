@@ -14,6 +14,8 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <fstream>
+#include <ctime>
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <openssl/crypto.h>
@@ -708,6 +710,59 @@ bool AppInit2(boost::thread_group& threadGroup)
     // ********************************************************* Step 5: verify wallet database integrity
 
     if (!fDisableWallet) {
+        // Apply any staged wallet.dat import (V1.5: written by Qt GUI's
+        // BlazecoinGUI::importWallet before exit). The marker contains the
+        // absolute path of the source wallet.dat. The current wallet.dat is
+        // backed up with a timestamp suffix, then the source is copied in.
+        // BDB env files (log.* / __db.*) are removed so a fresh env is
+        // created on next open.
+        {
+            boost::filesystem::path markerPath = GetDataDir() / "wallet-import-pending.txt";
+            if (boost::filesystem::exists(markerPath)) {
+                std::ifstream in(markerPath.string().c_str());
+                std::string srcStr;
+                if (in) std::getline(in, srcStr);
+                in.close();
+
+                if (srcStr.empty() || !boost::filesystem::exists(srcStr)) {
+                    boost::filesystem::remove(markerPath);
+                    InitWarning(_("Wallet import marker present but source file is missing; skipped."));
+                } else {
+                    boost::filesystem::path src(srcStr);
+                    boost::filesystem::path dst = GetDataDir() / "wallet.dat";
+
+                    char tsBuf[32];
+                    time_t now = time(NULL);
+                    strftime(tsBuf, sizeof(tsBuf), "%Y%m%d-%H%M%S", localtime(&now));
+                    boost::filesystem::path bak = GetDataDir() / (std::string("wallet.dat.bak.") + tsBuf);
+
+                    try {
+                        if (boost::filesystem::exists(dst))
+                            boost::filesystem::rename(dst, bak);
+                        // dst no longer exists after the rename above, so a
+                        // plain copy_file is sufficient (and avoids Boost
+                        // version skew on copy_option/copy_options).
+                        boost::filesystem::copy_file(src, dst);
+
+                        // Remove old BDB env files so a clean env is created.
+                        boost::filesystem::directory_iterator it(GetDataDir()), end;
+                        for (; it != end; ++it) {
+                            std::string name = it->path().filename().string();
+                            if (name == "log.0000000001" || name.compare(0, 5, "__db.") == 0) {
+                                boost::system::error_code ec;
+                                boost::filesystem::remove(it->path(), ec);
+                            }
+                        }
+                        boost::filesystem::remove(markerPath);
+                        uiInterface.InitMessage(_("Imported wallet.dat (previous saved as ") + bak.filename().string() + ")");
+                    } catch (const std::exception &e) {
+                        boost::filesystem::remove(markerPath);
+                        return InitError(std::string("Wallet import failed: ") + e.what());
+                    }
+                }
+            }
+        }
+
         uiInterface.InitMessage(_("Verifying wallet..."));
 
         if (!bitdb.Open(GetDataDir()))
