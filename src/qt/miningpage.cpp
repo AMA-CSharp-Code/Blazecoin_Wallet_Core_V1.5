@@ -72,8 +72,8 @@ void MiningPage::slotThreadsChanged(int n)
     const int nMax = ui->procSlider->maximum();
     const bool bHot = (nMax > 1) && (n * 4 > nMax * 3);
     ui->lThreadCount->setStyleSheet(
-        bHot ? "QLabel { color: #C0392B; font-size: 14px; font-weight: bold; }"
-             : "QLabel { color: #0052AE; font-size: 14px; }");
+        bHot ? "QLabel { color: #FF6B6B; font-size: 14px; font-weight: bold; }"
+             : "QLabel { color: #FFFFFF; font-size: 14px; }");
 }
 
 void MiningPage::slotUpdateSpeed()
@@ -122,11 +122,11 @@ void MiningPage::clear()
 
     ui->miningLog->document()->setDefaultStyleSheet(
                 "table { }"
-                "td.time { color: #808080; padding-top: 3px; } "
-                "td.message { font-family: Monospace; font-size: 12px; } "
-                "td.cmd-request { color: #590607; } "
-                "td.cmd-error { color: red; } "
-                "b { color: #590607; } "
+                "td.time { color: #b0b0b0; padding-top: 3px; } "
+                "td.message { font-family: Monospace; font-size: 12px; color: #FFFFFF; } "
+                "td.cmd-request { color: #FFFFFF; } "
+                "td.cmd-error { color: #FF6B6B; } "
+                "b { color: #FFFFFF; } "
                 );
 }
 

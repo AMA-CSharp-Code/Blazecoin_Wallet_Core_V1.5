@@ -82,6 +82,7 @@ private:
     Ui::MainWindow *ui;
     QBitmap _mask;
     QBitmap _logoWidgetMask;
+    QPixmap m_bgTile;
 
     ClientModel *clientModel;
     WalletModel *walletModel;

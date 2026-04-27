@@ -168,7 +168,7 @@
    <item>
     <widget class="Line" name="line_3">
      <property name="styleSheet">
-      <string notr="true">background-color: #0052AE;</string>
+      <string notr="true">background-color: #d80317;</string>
      </property>
      <property name="lineWidth">
       <number>0</number>
@@ -244,9 +244,16 @@
          <string notr="true"/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../res.qrc">:/res/last_transactions.png</pixmap>
+         <pixmap resource="../res.qrc">:/res/transactions.png</pixmap>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacerIconText">
+        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+        <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>10</width><height>20</height></size></property>
+       </spacer>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -277,11 +284,11 @@
     <widget class="QWidget" name="wTransactionsContainer" native="true">
      <property name="styleSheet">
       <string notr="true">#wTransactionsContainer {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
  }
 
 QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }
 </string>
      </property>
@@ -328,13 +335,13 @@ QScrollBar::sub-line:vertical {
 }
 
 QHeaderView {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
 	font-size: 10;
 	text-align:left;
 }
 QHeaderView::section {
-    background-color: #D8DFE9;
-    color: #0052AE;
+    background-color: rgba(0, 0, 0, 180);
+    color: #FFFFFF;
     padding-left: 5px;
     border: 0px solid #6c6c6c;
 	text-align:left;

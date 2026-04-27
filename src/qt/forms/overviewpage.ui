@@ -189,7 +189,7 @@
       <item>
        <widget class="Line" name="line">
         <property name="styleSheet">
-         <string notr="true">background-color: #0052AE;</string>
+         <string notr="true">background-color: #d80317;</string>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
@@ -251,7 +251,7 @@
 }</string>
          </property>
          <property name="text">
-          <string>Account status</string>
+          <string>Account Status</string>
          </property>
         </widget>
        </widget>
@@ -266,7 +266,7 @@
         </property>
         <property name="styleSheet">
          <string notr="true">#wState {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
 }</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
@@ -281,7 +281,7 @@
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">color: #0052AE;</string>
+              <string notr="true">color: #FFFFFF;</string>
              </property>
              <property name="text">
               <string>0 WDC</string>
@@ -327,7 +327,7 @@
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">color: #0052AE;</string>
+              <string notr="true">color: #FFFFFF;</string>
              </property>
              <property name="text">
               <string>0 WDC</string>
@@ -373,7 +373,7 @@
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">color: #0052AE;</string>
+              <string notr="true">color: #FFFFFF;</string>
              </property>
              <property name="text">
               <string>0 WDC</string>
@@ -436,7 +436,7 @@
 	margin-right: 0px;
 	margin-top: 0px;
 	margin-bottom: 0px;
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
              </property>
              <property name="text">
@@ -483,7 +483,7 @@
 	margin-right: 0px;
 	margin-top: 0px;
 	margin-bottom: 0px;
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
              </property>
              <property name="text">
@@ -530,7 +530,7 @@
 	margin-right: 0px;
 	margin-top: 0px;
 	margin-bottom: 0px;
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
              </property>
              <property name="text">
@@ -573,7 +573,7 @@
       <item>
        <widget class="Line" name="line_2">
         <property name="styleSheet">
-         <string notr="true">background-color: #000000;</string>
+         <string notr="true">background-color: #d80317;</string>
         </property>
         <property name="lineWidth">
          <number>0</number>
@@ -627,7 +627,7 @@ color: white;
 }</string>
          </property>
          <property name="text">
-          <string>Last transactions</string>
+          <string>Last Transactions</string>
          </property>
         </widget>
        </widget>
@@ -840,7 +840,7 @@ color: white;
         </property>
         <property name="styleSheet">
          <string notr="true">#wLastTransactionsContainer {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
 	color: black;
 }</string>
         </property>
@@ -870,12 +870,12 @@ color: white;
          <property name="styleSheet">
           <string notr="true"> QScrollBar:vertical {
      border: 0px solid grey;
-     background: white;
+     background: rgba(0, 0, 0, 60);
      width: 9px;
      margin: 15px 0px 0 0px;
  }
  QScrollBar::handle:vertical {
-     background: #D8DFE9;
+     background: rgba(255, 255, 255, 90);
      min-width: 20px;
  }
 QScrollBar::sub-line:vertical {
@@ -884,14 +884,14 @@ QScrollBar::sub-line:vertical {
 }
 
 QHeaderView {
-	background-color: #D8DFE9;
+	background-color: transparent;
 	font-size: 10;
 	text-align:left;
-color: black;
+color: #FFFFFF;
 }
 QHeaderView::section {
-    background-color: #D8DFE9;
-    color: #0052AE;
+    background-color: transparent;
+    color: #FFFFFF;
     padding-left: 5px;
     border: 0px solid #6c6c6c;
 	text-align:left;
@@ -907,9 +907,10 @@ QHeaderView::up-arrow {
 }
 
 QTableView {
-	selection-background-color: #ebebeb;
-	selection-color:  black;
-	color: black;
+	background-color: transparent;
+	selection-background-color: rgba(255, 255, 255, 40);
+	selection-color: #FFFFFF;
+	color: #FFFFFF;
 }</string>
          </property>
          <property name="frameShape">

@@ -56,7 +56,7 @@ QDialog {
     <widget class="QFrame" name="frame">
      <property name="styleSheet">
       <string notr="true">#frame {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
     border-style:none;
 }</string>
      </property>

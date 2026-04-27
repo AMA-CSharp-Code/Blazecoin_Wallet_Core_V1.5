@@ -21,7 +21,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }
 QLineEdit {
 	border: 1px solid #ededed;

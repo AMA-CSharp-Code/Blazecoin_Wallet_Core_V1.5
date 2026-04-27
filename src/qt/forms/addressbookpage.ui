@@ -160,7 +160,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">#AddressBookPage {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
  }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -182,7 +182,7 @@
    <item>
     <widget class="Line" name="line_6">
      <property name="styleSheet">
-      <string notr="true">background-color: #0052AE;</string>
+      <string notr="true">background-color: #d80317;</string>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
@@ -254,7 +254,7 @@
      <widget class="QLabel" name="label_25_1">
       <property name="geometry">
        <rect>
-        <x>46</x>
+        <x>11</x>
         <y>0</y>
         <width>38</width>
         <height>30</height>
@@ -288,9 +288,9 @@
      <widget class="QLabel" name="label_27">
       <property name="geometry">
        <rect>
-        <x>81</x>
+        <x>48</x>
         <y>6</y>
-        <width>103</width>
+        <width>320</width>
         <height>18</height>
        </rect>
       </property>
@@ -361,29 +361,29 @@ QPushButton:hover {
       <string>Double-click to edit address or label</string>
      </property>
      <property name="styleSheet">
-      <string notr="true"> QScrollBar:vertical {
+      <string notr="true">QScrollBar:vertical {
      border: 0px solid grey;
-     background: white;
+     background: rgba(0, 0, 0, 60);
      width: 9px;
      margin: 24px 0px 0 0px;
- }
- QScrollBar::handle:vertical {
-     background: #BB9396;
+}
+QScrollBar::handle:vertical {
+     background: rgba(255, 255, 255, 90);
      min-width: 20px;
- }
+}
 QScrollBar::sub-line:vertical {
 	height: 0px;
     width: 0px;
 }
 
 QHeaderView {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
 	font-size: 10;
 	text-align:left;
 }
 QHeaderView::section {
-    background-color: #D8DFE9;
-     color: #0052AE;
+    background-color: rgba(0, 0, 0, 180);
+     color: #FFFFFF;
     padding-left: 5px;
     border: 0px solid #6c6c6c;
 	text-align:left;
@@ -399,9 +399,17 @@ QHeaderView::up-arrow {
 }
 
 QTableView {
-	border: 1px solid #ededed;
-	selection-background-color: #ebebeb;
-	selection-color:  rgb(0, 82, 174);
+	background-color: rgba(0, 0, 0, 180);
+	alternate-background-color: rgba(255, 255, 255, 30);
+	color: #d80317;
+	border: 1px solid #d80317;
+	selection-background-color: rgba(216, 3, 23, 120);
+	selection-color: #FFFFFF;
+	gridline-color: rgba(255, 255, 255, 30);
+}
+QTableView::item {
+	background-color: transparent;
+	color: #d80317;
 }</string>
      </property>
      <property name="frameShape">
@@ -734,7 +742,7 @@ QPushButton:!enabled {
        </property>
        <property name="styleSheet">
         <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -744,11 +752,11 @@ QPushButton:!enabled {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #9D0B17;
+	background-color: #d80317;
 }</string>
        </property>
        <property name="standardButtons">

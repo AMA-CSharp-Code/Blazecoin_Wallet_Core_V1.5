@@ -15,7 +15,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }
 
 QDialog {
@@ -33,7 +33,7 @@ QDialog {
     <widget class="QFrame" name="frame">
      <property name="styleSheet">
       <string notr="true">#frame {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
     border-style:none;
 }</string>
      </property>
@@ -299,7 +299,7 @@ QPushButton:hover {
               <widget class="QDialogButtonBox" name="buttonBox">
                <property name="styleSheet">
                 <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -309,11 +309,11 @@ QPushButton:hover {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #0099CC;
+	background-color: #d80317;
 }</string>
                </property>
                <property name="orientation">

@@ -13,6 +13,8 @@
 | 2026-04-26 | §9 | Added 1M / 1.5M / 2M / 2.5M / 3M / 4M checkpoint match results |
 | 2026-04-26 | §13 (new), §6, §7, §9 | Added Qt 5.15 GUI build (blazecoin-qt.exe) and per-version data-dir change |
 | 2026-04-27 | §9.2 (new) | Added RPC throughput benchmark — V1.5 is 5–11 % faster than stock 0.8.6.2 |
+| 2026-04-27 | §13.1 (new), §8 | Mining page rework: layout converted to QHBoxLayout/QVBoxLayout, Speed moved into header, slider gains thread-count readout + 75 % danger-zone warning, slider max capped at cores − 1, Win 7+ `GetActiveProcessorCount` for >64-core boxes |
+| 2026-04-27 | §13.2 (new), §8 | Qt GUI visual redesign: tiled phoenix-coin wallpaper (cached `QPixmap` painted in `BlazecoinGUI::paintEvent` below the 127 px main header), main-window logo coin recomposited, semi-transparent black panels (`rgba(0,0,0,180)`) replace light-blue containers across overview / mining / send / receive / address book / sign / verify / encrypt / about / transactions, red `#d80317` accent lines + button hovers, white text throughout, network connection icons recolored red, address-book table styled (transparent items, `rgba(255,255,255,30)` alternate rows, left-aligned via model `Qt::TextAlignmentRole`) |
 
 ---
 
@@ -497,6 +499,148 @@ $env:PATH = "C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\t
 ```
 
 The GUI defaults to `%APPDATA%\BlazecoinV1.5\` (see § 9.1).
+
+---
+
+## 13. Qt GUI redesign (2026-04-27)
+
+Two waves of work landed on top of the working Qt 5.15 build: a rework of the mining
+page and a wallet-wide visual theme. Both are pure Qt-side changes — no consensus
+or core code is touched.
+
+### 13.1 Mining page rework
+
+- **Layout** converted from absolute geometry (`<rect>`-positioned children) to
+  proper `QHBoxLayout` / `QVBoxLayout` so the page resizes cleanly. Three rows now:
+  mining log, status row (Threads slider with numeric readout), buttons row.
+- **Speed** indicator moved from the bottom row into the dark page header
+  (top-right), restyled white-on-black to match the title strip.
+- **Slider** is fixed-width (240 px) so it does not dominate the row; tick marks
+  every 16 threads; new red-themed groove (`rgba(0,0,0,160)` with `rgba(216,3,23,100)`
+  border) and red handle (`#d80317`).
+- **Numeric thread readout** (`lThreadCount`) sits flush right of the slider; turns
+  bold red `#FF6B6B` above 75 % of usable cores as a thermal/power danger cue.
+- **Slider max** capped at `cores − 1` on multi-core boxes so the GUI/OS always
+  retain one core; single-core boxes still get their one thread.
+- **`>64-core` Windows fix** in `src/qt/miningpage.cpp` — `boost::thread::hardware_concurrency()`
+  only sees the current processor group (64-CPU cap). Now dynamically loads
+  `GetActiveProcessorCount` from `kernel32.dll` via `GetProcAddress` and passes
+  `ALL_PROCESSOR_GROUPS` (compile-time `_WIN32_WINNT=0x0501` hides the symbol,
+  hence the runtime lookup). Hard ceiling `kMiningThreadMax = 512`.
+- Note: miner threads already run at `THREAD_PRIORITY_LOWEST` in `main.cpp ~4643`,
+  so scheduler priority is not the bottleneck; the new caps and warning address
+  thermal/power saturation, which priority demotion cannot fix.
+
+### 13.2 Wallet-wide visual theme
+
+The wallet is now styled around a tiled phoenix-coin wallpaper with semi-transparent
+black panels and red accents.
+
+#### Tiled background
+
+- New resource `src/qt/res/blazecoin-bg.png` — a 450 × 450 super-tile composed from
+  two source images (`ComfyUI_02555_.png` and `ComfyUI_02889_.png`) in a 2 × 2
+  checker layout (`A B / B A`) so neighbours never repeat.
+- Painting goes through `BlazecoinGUI::paintEvent` (overridden) using
+  `QPainter::drawTiledPixmap`. A cached `QPixmap m_bgTile` member holds the
+  resource; the tile area is offset down by 127 px so it starts cleanly below
+  the main `wHeader` strip. `QSS background-repeat` and `QPalette::Window`
+  texture brushes were both tried first and are unreliable on `QMainWindow`.
+- Old solid-red `#MainWindow { background-color: rgb(158, 0, 15); }` rule
+  removed from `mainwindow.ui`.
+
+#### Logo
+
+- `src/qt/res/blazecoin-logo.png` regenerated: original gold coin replaced with
+  a circle-cropped (700 × 700 centred crop, 76 px diameter, antialiased
+  `GraphicsPath::AddEllipse`) phoenix coin from the source image. Banner
+  width / "BLAZECOIN" text / flame icon preserved.
+
+#### Panels and tabs
+
+- `wState` (Account status), `wLastTransactionsContainer`, `wContainer` (mining,
+  send), `#SendCoinsDialog` outer, `wAddressBookContainer`, `wStatusBar` (footer),
+  and the analogous containers in askpassphrase / signmessage / verifymessage /
+  aboutdialog / transactionspage / editaddress / transactiondesc all switched
+  from light `#D8DFE9` to `rgba(0, 0, 0, 180)` (footer at `210`). The `QScrollArea`
+  in `sendcoinsdialog` also gets `QScrollArea > QWidget > QWidget {
+  background-color: transparent }` so its viewport doesn't paint a default-grey
+  layer over the wallpaper.
+- Side-menu nav buttons (Send / Receive / Transactions / Address Book / Console)
+  given default `background-color: rgba(0, 0, 0, 200)` for legibility against
+  the wallpaper; hover/pressed state stays `#d80317` red.
+
+#### Accents and text
+
+- Thin accent lines above "Account Status" / "Last Transactions" / mining-page
+  header changed from blue `#0052AE` to red `#d80317`.
+- Blue `#0052AE` text recoloured to white throughout the panels (Balance,
+  Unconfirmed, Immature labels and values; Pay To / Label / Amount in
+  `sendcoinsentry.ui`; mining log message colours).
+- "Account status" → "Account Status", "Last transactions" → "Last Transactions",
+  "Mining coins" → "Mining Coins", "Address for receiving Blazecoins" → "Address
+  for Receiving Blazecoins" (capitalisation).
+
+#### Address-book / receive table
+
+- Rebuilt for dark mode: `QTableView { background-color: rgba(0,0,0,180);
+  alternate-background-color: rgba(255,255,255,30); color: #d80317; border:
+  1px solid #d80317; gridline-color: rgba(255,255,255,30); }` plus a
+  `QTableView::item { background: transparent; color: #d80317 }` rule.
+- Headers (`QHeaderView::section`) flipped from light blue to `rgba(0,0,0,180)`
+  with white text.
+- Cell and header text alignment now driven from the model:
+  `AddressTableModel::data()` and `headerData()` return
+  `Qt::AlignLeft | Qt::AlignVCenter` for `Qt::TextAlignmentRole`.
+- Receive-mode header layout fixed: `label_25_1` (download icon) moved from
+  `x=46` to `x=11` so the visible icon is always at the left edge regardless
+  of whether `SendingTab` or `ReceivingTab` is showing; `label_27` widened
+  from 103 → 320 px (so "Address for Receiving Blazecoins" no longer truncates)
+  and shifted from `x=81` to `x=48` to sit flush with the icon.
+
+#### Icons
+
+- `src/qt/res/connection_{1..5}.png` — WiFi-arc signal icons recoloured from
+  pale blue/grey to bright red `#FA031A`. The original alpha mask is
+  preserved (`Color.FromArgb(p.A, R, G, B)` per pixel); originals saved as
+  `.bak` siblings.
+- `src/qt/res/last_transactions.png` recoloured the same way (red briefcase),
+  but the Transactions page header was then re-pointed to `:/res/transactions.png`
+  (the side-menu's red-arrows icon) for consistency. A 10 px fixed spacer was
+  inserted between icon and title in the header layout.
+
+### 13.3 Files added / modified by §13
+
+```
+src/qt/blazecoingui.{h,cpp}       paintEvent override + cached QPixmap m_bgTile
+src/qt/miningpage.{h,cpp}         GetActiveProcessorCount lookup, slider readout,
+                                  thread cap, slot wiring; mining-log style tweaks
+src/qt/addresstablemodel.cpp      Qt::TextAlignmentRole in data() / headerData()
+src/qt/addressbookpage.cpp        "Address for Receiving Blazecoins" capitalisation
+src/qt/forms/mainwindow.ui        removed solid-red bg; added side-menu button bg;
+                                  footer rgba(0,0,0,210)
+src/qt/forms/miningpage.ui        full layout rework; red theme; slider restyle
+src/qt/forms/overviewpage.ui      black panels, white text, red accent lines, title case
+src/qt/forms/sendcoinsdialog.ui   transparent SendCoinsDialog + scrollArea viewport
+src/qt/forms/sendcoinsentry.ui    label color blue → white
+src/qt/forms/addressbookpage.ui   header layout fix; dark-mode QTableView styles
+src/qt/forms/{askpassphrase,signmessage,verifymessage,aboutdialog,
+              transactionspage,editaddress,transactiondesc}.ui
+                                  bulk colour mapping (sed) — light bg → rgba(0,0,0,180);
+                                  blue accent → red; blue text → white;
+                                  blue button → dark, hover/pressed → red
+src/qt/res.qrc                    + res/blazecoin-bg.png
+src/qt/res/blazecoin-bg.png       new — 450x450 2x2 checker tile (A B / B A)
+src/qt/res/blazecoin-logo.png     phoenix-coin replaces gold coin
+src/qt/res/connection_{1..5}.png  recoloured red (alpha preserved)
+src/qt/res/last_transactions.png  recoloured red (kept for non-header uses)
+```
+
+**Build note:** the Qt resource compiler (`rcc`) is not triggered by changes to PNG
+files referenced in `res.qrc` — only by changes to `res.qrc` itself. After
+modifying any embedded resource without changing the .qrc, run
+`touch src/qt/res.qrc` (or delete `build/release/qrc_blazecoin.obj`) before
+rebuilding so the embedded copy is refreshed.
 
 ---
 

@@ -63,6 +63,7 @@
         <file>res/wallet-background.png</file>
         <file>res/wallet-header.jpg</file>
         <file>res/blazecoin-logo.png</file>
+        <file>res/blazecoin-bg.png</file>
         <file>res/blazecoin-qt.rc</file>
         <file>res/zerocoin_icon_off.png</file>
         <file>res/zerocoin_icon_on.png</file>

@@ -38,6 +38,10 @@
 #include "util.h"
 #include "message_box_dialog.h"
 
+#include <QPalette>
+#include <QBrush>
+#include <QPixmap>
+
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
@@ -101,6 +105,11 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
 
     ui->setupUi(this);
     setWindowFlags(Qt::CustomizeWindowHint | Qt::FramelessWindowHint | Qt::Window);
+
+    // Tiled background pixmap, drawn manually in paintEvent.
+    // QMainWindow ignores both QSS background-repeat and QPalette
+    // texture brushes reliably, so the only robust path is paintEvent.
+    m_bgTile = QPixmap(":/res/blazecoin-bg.png");
 
     ui->wCaption->installEventFilter(new DialogMoveHandler(this));
 
@@ -1016,6 +1025,17 @@ void BlazecoinGUI::paintEvent(QPaintEvent *e)
     updateMask();
 
     QPainter painter(this);
+    if (!m_bgTile.isNull()) {
+        // Skip the top header strip (wHeader is a fixed 127px tall) so the
+        // tile pattern starts cleanly at the header's bottom edge instead of
+        // running underneath it.
+        const int kHeaderH = 127;
+        if (height() > kHeaderH) {
+            painter.drawTiledPixmap(
+                QRect(0, kHeaderH, width(), height() - kHeaderH),
+                m_bgTile);
+        }
+    }
     painter.setRenderHint(QPainter::Antialiasing); // we need this in order to get correct rounded corners
     painter.setPen(QPen(QBrush(Qt::black), 2.0));
     painter.setBrush(QBrush(QColor(140, 30, 37)));

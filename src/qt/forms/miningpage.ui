@@ -180,7 +180,7 @@
    <item>
     <widget class="Line" name="lineBefore">
      <property name="styleSheet">
-      <string notr="true">background-color: #0052AE;</string>
+      <string notr="true">background-color: #d80317;</string>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
@@ -266,7 +266,7 @@
 }</string>
          </property>
          <property name="text">
-          <string>Mining coins</string>
+          <string>Mining Coins</string>
          </property>
         </widget>
        </widget>
@@ -308,8 +308,9 @@
         </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
-	color: #FFFFFF;
+	color: #d80317;
 	font-size: 14px;
+	font-weight: bold;
 }</string>
         </property>
         <property name="alignment">
@@ -330,7 +331,7 @@
     <widget class="QWidget" name="wContainer" native="true">
      <property name="styleSheet">
       <string notr="true">#wContainer {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
 }</string>
      </property>
      <layout class="QVBoxLayout" name="containerLayout">
@@ -439,14 +440,19 @@
        </palette>
       </property>
       <property name="styleSheet">
-       <string notr="true"> QScrollBar:vertical {
+       <string notr="true">QTextEdit {
+     background-color: transparent;
+     color: #FFFFFF;
+     border: 0px;
+}
+QScrollBar:vertical {
      border: 0px solid grey;
-     background: white;
+     background: rgba(0, 0, 0, 60);
      width: 9px;
      margin: 0px 0px 0 0px;
  }
  QScrollBar::handle:vertical {
-     background: #D8DFE9;
+     background: rgba(255, 255, 255, 90);
      min-width: 20px;
  }</string>
       </property>
@@ -472,6 +478,9 @@
         </item>
         <item>
          <widget class="QLabel" name="label">
+          <property name="styleSheet">
+           <string notr="true">QLabel { color: #FFFFFF; }</string>
+          </property>
           <property name="text"><string>Threads:</string></property>
          </widget>
         </item>
@@ -500,24 +509,24 @@
       </property>
       <property name="styleSheet">
        <string notr="true">QSlider::groove {
-	border: 1px solid #ededed;
-	background-color: white;
+	border: 1px solid rgba(216, 3, 23, 100);
+	background-color: rgba(0, 0, 0, 160);
 	min-height: 20px;
 }
 QSlider::groove:disabled {
-	background-color: #e0e0e0;
+	background-color: rgba(0, 0, 0, 80);
 }
 
 QSlider::handle {
 	border: none;
-	background-color: #758EB3;
+	background-color: #d80317;
     width: 18px;
 }
 QSlider::handle:hover {
-	background-color: #0099CC;
+	background-color: #FF1A2E;
 }
 QSlider::handle:pressed {
-	background-color: #0099CC;
+	background-color: #FF1A2E;
 }
 </string>
       </property>
@@ -539,7 +548,7 @@ QSlider::handle:pressed {
       </property>
       <property name="styleSheet">
        <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 	font-size: 14px;
 }</string>
       </property>
@@ -578,7 +587,7 @@ QSlider::handle:pressed {
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 30px;
@@ -588,11 +597,11 @@ QSlider::handle:pressed {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #9D0B17;
+	background-color: #d80317;
 }</string>
       </property>
       <property name="text">
@@ -616,7 +625,7 @@ QPushButton:pressed:flat {
       </property>
       <property name="styleSheet">
        <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 30px;
@@ -626,11 +635,11 @@ QPushButton:pressed:flat {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #9D0B17;
+	background-color: #d80317;
 }</string>
       </property>
       <property name="text">

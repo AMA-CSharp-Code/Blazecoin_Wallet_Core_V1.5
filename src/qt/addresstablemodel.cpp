@@ -198,6 +198,10 @@ QVariant AddressTableModel::data(const QModelIndex &index, int role) const
         }
         return font;
     }
+    else if (role == Qt::TextAlignmentRole)
+    {
+        return int(Qt::AlignLeft | Qt::AlignVCenter);
+    }
     else if (role == TypeRole)
     {
         switch(rec->type)
@@ -287,6 +291,9 @@ QVariant AddressTableModel::headerData(int section, Qt::Orientation orientation,
         } else if (role == Qt::SizeHintRole)
         {
             return QSize(0, 24);
+        } else if (role == Qt::TextAlignmentRole)
+        {
+            return int(Qt::AlignLeft | Qt::AlignVCenter);
         }
     }
     return QVariant();

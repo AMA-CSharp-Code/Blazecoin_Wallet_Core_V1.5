@@ -110,7 +110,7 @@
    <string>Transaction details</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #D8DFE9;</string>
+   <string notr="true">background-color: rgba(0, 0, 0, 180);</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -247,7 +247,7 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -257,11 +257,11 @@
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #0099CC;
+	background-color: #d80317;
 }</string>
      </property>
      <property name="orientation">

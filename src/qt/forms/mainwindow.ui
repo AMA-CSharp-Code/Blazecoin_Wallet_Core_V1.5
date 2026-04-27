@@ -19,9 +19,9 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#MainWindow {
-	background-color: rgb(158, 0, 15);
-}
+   <string notr="true">/* MainWindow background is set via QPalette texture brush in C++
+   (see BlazecoinGUI ctor) — Qt's QSS background-repeat is unreliable
+   on QMainWindow. */
 
 QMenu {
     background-color: #9e000f;
@@ -170,6 +170,7 @@ QCheckBox::indicator:checked:pressed {
 	border: 0px solid gray;
 	padding: 3px 5px 3px 5px;
 	color: white;
+	background-color: rgba(0, 0, 0, 200);
 }
 
 QPushButton:pressed:flat {
@@ -224,6 +225,7 @@ QPushButton:hover {
 	border: 0px solid gray;
 	padding: 3px 5px 3px 5px;
 	color: white;
+	background-color: rgba(0, 0, 0, 200);
 }
 
 QPushButton:pressed:flat {
@@ -278,6 +280,7 @@ QPushButton:hover {
 	border: 0px solid gray;
 	padding: 3px 5px 3px 5px;
 	color: white;
+	background-color: rgba(0, 0, 0, 200);
 }
 
 QPushButton:pressed:flat {
@@ -332,6 +335,7 @@ QPushButton:hover {
 	border: 0px solid gray;
 	padding: 3px 5px 3px 5px;
 	color: white;
+	background-color: rgba(0, 0, 0, 200);
 }
 
 QPushButton:pressed:flat {
@@ -386,6 +390,7 @@ QPushButton:hover {
 	border: 0px solid gray;
 	padding: 3px 5px 3px 5px;
 	color: white;
+	background-color: rgba(0, 0, 0, 200);
 }
 
 QPushButton:pressed:flat {
@@ -978,7 +983,7 @@ QPushButton:hover {
     </property>
     <property name="styleSheet">
      <string notr="true">#wStatusBar {
-	background-color: #9e000f;
+	background-color: rgba(0, 0, 0, 210);
 }
 QLabel {
 	color: #c8e1e1;

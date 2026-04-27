@@ -63,7 +63,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
         break;
     case ReceivingTab:
         ui->label_25->setVisible(false);
-        ui->label_27->setText(tr("Address for receiving Blazecoins"));
+        ui->label_27->setText(tr("Address for Receiving Blazecoins"));
         ui->deleteButton->setVisible(false);
         ui->signMessage->setVisible(true);
         ui->verifyMessage->setVisible(false);
