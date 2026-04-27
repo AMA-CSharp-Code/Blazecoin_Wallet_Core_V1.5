@@ -12,6 +12,7 @@
 | 2026-04-26 | §1, §2.2, §2.3, §9 | Corrected attribution: 0.8.6.2 syncs fine; the 2M stall was V2.0 specific |
 | 2026-04-26 | §9 | Added 1M / 1.5M / 2M / 2.5M / 3M / 4M checkpoint match results |
 | 2026-04-26 | §13 (new), §6, §7, §9 | Added Qt 5.15 GUI build (blazecoin-qt.exe) and per-version data-dir change |
+| 2026-04-27 | §9.2 (new) | Added RPC throughput benchmark — V1.5 is 5–11 % faster than stock 0.8.6.2 |
 
 ---
 
@@ -395,6 +396,20 @@ blazecoin-qt.pro          MSVC-aware: gated GCC-only flags, MSVC defines
 | RPC commands respond | Pass — `getblockcount`, `getconnectioncount`, `getinfo`, `getblockhash`, etc. |
 | `blazecoin-qt.exe` (GUI) builds and links | Pass — 4.5 MB binary at `release/blazecoin-qt.exe` |
 | GUI defaults to `%APPDATA%\BlazecoinV1.5\` | Pass — daemon and GUI both honor the per-version path |
+
+### 9.2 RPC throughput benchmark (added 2026-04-27)
+
+Direct head-to-head between V1.5 (MSVC 2022 build) and stock 0.8.6.2 (the 2019 MinGW production binary at `C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe`). Both daemons running, both at chain tip (4,105,596). 1000 calls per HTTP request via JSON-RPC batching, best of 3 runs:
+
+| Operation | V1.5 (MSVC 2022) | Stock 0.8.6.2 (2019) | V1.5 advantage |
+|-----------|------------------:|---------------------:|---------------:|
+| `getblockcount` | **3,984 ops/sec** (251 µs) | 3,690 ops/sec (271 µs) | **+8.0 %** |
+| `getblockhash 1000000` | **4,063 ops/sec** (246 µs) | 3,668 ops/sec (273 µs) | **+10.8 %** |
+| `getblock <2M hash>` (full JSON) | **1,681 ops/sec** (595 µs) | 1,601 ops/sec (625 µs) | **+5.0 %** |
+
+V1.5 is consistently 5–11 % faster across the three operation types. Lighter ops (in-memory state lookups) benefit more — those are tight code paths where the modern MSVC optimizer beats the 2019 MinGW build. Heavier ops (disk read + JSON serialization for `getblock`) benefit less because their time is dominated by I/O and parser work, neither of which is affected by compiler choice.
+
+Reproducible via `./bench-rpc-batch.sh [N]` from the repo root (defaults to N=1000 calls). Requires both daemons running on their respective ports; edit credentials in the script if reusing.
 
 ---
 
