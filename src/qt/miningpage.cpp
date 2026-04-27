@@ -14,6 +14,16 @@
 #include <QUrl>
 #include <QScrollBar>
 
+#ifdef WIN32
+// For GetActiveProcessorCount across all processor groups (Windows 7+).
+// boost::thread::hardware_concurrency() only sees the current group (64-cpu cap),
+// which is insufficient on >64-core systems (e.g. dual 96-core CPUs).
+#include <windows.h>
+#endif
+
+// Hard cap on the slider so future hardware doesn't immediately need a recompile.
+static const int kMiningThreadMax = 512;
+
 MiningPage::MiningPage(QWidget *parent, BlazecoinGUI *mainForm) :
     QWidget(parent),
     ui(new Ui::MiningPage)
@@ -22,13 +32,48 @@ MiningPage::MiningPage(QWidget *parent, BlazecoinGUI *mainForm) :
     ui->setupUi(this);
     clear();
     ui->procSlider->setMinimum(1);
-    int nProcessors = boost::thread::hardware_concurrency();
-    ui->procSlider->setMaximum(nProcessors);
-    ui->procSlider->setValue(nProcessors / 2);
+    int nProcessors = 0;
+#ifdef WIN32
+    // Look up GetActiveProcessorCount dynamically (the codebase sets
+    // _WIN32_WINNT to 0x0501 which hides the Win7+ symbol at compile time).
+    typedef DWORD (WINAPI *GAPCFn)(WORD);
+    HMODULE hKernel = GetModuleHandleA("kernel32.dll");
+    if (hKernel) {
+        GAPCFn pGetActiveProcessorCount =
+            (GAPCFn)GetProcAddress(hKernel, "GetActiveProcessorCount");
+        if (pGetActiveProcessorCount)
+            nProcessors = (int)pGetActiveProcessorCount(0xFFFF /*ALL_PROCESSOR_GROUPS*/);
+    }
+#endif
+    if (nProcessors <= 0)
+        nProcessors = (int)boost::thread::hardware_concurrency();
+    if (nProcessors < 1)
+        nProcessors = 1;
+    if (nProcessors > kMiningThreadMax)
+        nProcessors = kMiningThreadMax;
+    // Reserve one core for the OS/GUI on multi-core systems so the wallet
+    // stays responsive at max slider — single-core boxes still get to use it.
+    int nMaxThreads = (nProcessors > 1) ? (nProcessors - 1) : 1;
+    ui->procSlider->setMaximum(nMaxThreads);
+    ui->procSlider->setValue((nMaxThreads + 1) / 2);
+    connect(ui->procSlider, SIGNAL(valueChanged(int)), this, SLOT(slotThreadsChanged(int)));
+    slotThreadsChanged(ui->procSlider->value());
     QTimer* ptimer = new QTimer(this);
     connect(ptimer, SIGNAL(timeout()), SLOT(slotUpdateSpeed()));
     ptimer->start(1000);
     slotUpdateSpeed();
+}
+
+void MiningPage::slotThreadsChanged(int n)
+{
+    ui->lThreadCount->setText(QString::number(n));
+    // Visual warning when the user pushes past 75% of usable cores —
+    // sustained near-max mining can thermal-throttle or overload the PSU.
+    const int nMax = ui->procSlider->maximum();
+    const bool bHot = (nMax > 1) && (n * 4 > nMax * 3);
+    ui->lThreadCount->setStyleSheet(
+        bHot ? "QLabel { color: #C0392B; font-size: 14px; font-weight: bold; }"
+             : "QLabel { color: #0052AE; font-size: 14px; }");
 }
 
 void MiningPage::slotUpdateSpeed()

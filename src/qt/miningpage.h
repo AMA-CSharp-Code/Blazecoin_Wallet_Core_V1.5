@@ -32,6 +32,7 @@ public slots:
     void message(int category, const QString &message, bool html = false);
     void scrollToEnd();
     void slotUpdateSpeed();
+    void slotThreadsChanged(int n);
 
 private slots:
     void on_bStartMining_clicked();
