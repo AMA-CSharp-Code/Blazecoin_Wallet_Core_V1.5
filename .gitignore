@@ -79,7 +79,6 @@ Thumbs.db
 desktop.ini
 
 # ---- Editor / local tooling ----
-.claude/
 .lock
 .vscode/
 .idea/
