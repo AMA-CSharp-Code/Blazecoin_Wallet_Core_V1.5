@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QObject>
-#include <QMessageBox>
+#include <QDialog>
 
 class SendCoinsRecipient;
 
@@ -97,14 +97,14 @@ namespace GUIUtil
     bool SetStartOnSystemStartup(bool fAutoStart);
 
     /** Help message for Blazecoin-Qt, shown with --help. */
-    class HelpMessageBox : public QMessageBox
+    class HelpMessageBox : public QDialog
     {
         Q_OBJECT
 
     public:
         HelpMessageBox(QWidget *parent = 0);
 
-        /** Show message box or print help message to standard output, based on operating system. */
+        /** Show dialog or print help message to standard output, based on operating system. */
         void showOrPrint();
 
         /** Print help message to console */

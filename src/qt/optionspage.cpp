@@ -163,13 +163,6 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->autoMining, OptionsModel::StartMiningAtStartup);
 
     mapper->addMapping(ui->allowSounds, OptionsModel::AllowSounds);
-    mapper->addMapping(ui->checkUpdatesAtStartup, OptionsModel::CheckUpdatesAtStartup);
-}
-
-void OptionsDialog::setCheckUpdatesAtStartup(bool bChecked)
-{
-    ui->checkUpdatesAtStartup->setChecked(bChecked);
-    on_applyButton_clicked();
 }
 
 void OptionsDialog::enableApplyButton()

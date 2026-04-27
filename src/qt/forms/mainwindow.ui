@@ -670,15 +670,24 @@ QPushButton:pressed {
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
-	image: url(:/res/close_normal.png);
+	background-color: transparent;
+	background-image: url(:/res/close_normal.png);
+	background-repeat: no-repeat;
+	background-position: center;
 	border: 0px solid gray;
 }
 QPushButton:pressed:flat {
-	image: url(:/res/close_normal.png);
+	background-color: #FF1A2E;
+	background-image: url(:/res/close_normal.png);
+	background-repeat: no-repeat;
+	background-position: center;
 }
 
 QPushButton:hover {
-	image: url(:/res/close_normal.png);
+	background-color: #d80317;
+	background-image: url(:/res/close_normal.png);
+	background-repeat: no-repeat;
+	background-position: center;
 }</string>
           </property>
           <property name="text">

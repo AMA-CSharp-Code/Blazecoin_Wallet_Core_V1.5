@@ -25,8 +25,6 @@ public:
     void setModel(OptionsModel *model);
     void setMapper();
 
-    void setCheckUpdatesAtStartup(bool bChecked);
-
 protected:
     bool eventFilter(QObject *object, QEvent *event);
 

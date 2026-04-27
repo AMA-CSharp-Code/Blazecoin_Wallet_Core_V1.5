@@ -31,7 +31,6 @@ public:
         StartMiningAtStartup, //bool
         Language,          // QString
         AllowSounds,        // bool
-        CheckUpdatesAtStartup, // bool
         OptionIDRowCount
     };
 
@@ -54,7 +53,6 @@ public:
     bool getStartMiningAtStartup() { return bStartMiningAtStartup; }
     QString getLanguage() { return language; }
     bool getAllowSounds() { return bAllowSounds; }
-    bool getCheckUpdatesAtStartup() { return bCheckUpdatesAtStartup; }
 
 private:
     int nDisplayUnit;
@@ -64,7 +62,6 @@ private:
     bool bStartMiningAtStartup;
     QString language;
     bool bAllowSounds;
-    bool bCheckUpdatesAtStartup;
 
 signals:
     void displayUnitChanged(int unit);

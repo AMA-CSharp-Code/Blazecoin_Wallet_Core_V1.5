@@ -375,9 +375,9 @@ void BlazecoinGUI::createActions(bool fIsTestnet)
     backupWalletAction->setStatusTip(tr("Backup wallet to another location"));
     changePassphraseAction = new QAction(QIcon(":/icons/key"), tr("&Change Passphrase..."), this);
     changePassphraseAction->setStatusTip(tr("Change the passphrase used for wallet encryption"));
-    signMessageAction = new QAction(QIcon(":/icons/edit"), tr("Sign &message..."), this);
+    signMessageAction = new QAction(QIcon(":/icons/edit"), tr("Sign &Message..."), this);
     signMessageAction->setStatusTip(tr("Sign messages with your Blazecoin addresses to prove you own them"));
-    verifyMessageAction = new QAction(QIcon(":/icons/transaction_0"), tr("&Verify message..."), this);
+    verifyMessageAction = new QAction(QIcon(":/icons/transaction_0"), tr("&Verify Message..."), this);
     verifyMessageAction->setStatusTip(tr("Verify messages to ensure they were signed with specified Blazecoin addresses"));
 
     exportAction = new QAction(QIcon(":/icons/export"), tr("&Export..."), this);
@@ -1086,7 +1086,7 @@ void BlazecoinGUI::menuFileRequested()
 {
     QMenu menu(this);
     QAction* home = menu.addAction(tr("&Overview").remove('&'));
-    QAction* messages = menu.addAction(tr("Service messages"));
+    QAction* messages = menu.addAction(tr("Service Messages"));
     QAction* qaBackupWallet = menu.addAction(tr("Backup Wallet"));
     QAction* exportData = menu.addAction(tr("&Export...").remove('&').remove("..."));
     QAction* exitApp = menu.addAction(QIcon("://res/menu/menu_exit.png"), tr("E&xit").remove('&'));
@@ -1135,8 +1135,8 @@ void BlazecoinGUI::menuOperationsRequested()
     QAction* encryptWallet = menu.addAction(tr("&Encrypt Wallet...").remove('&').remove("..."));
     QAction* mining = menu.addAction(tr("Mining"));
     QAction* changePassword = menu.addAction(tr("&Change Passphrase...").remove('&').remove("..."));
-    QAction* signMessage = menu.addAction(QIcon("://res/menu/sign.png"), tr("Sign &message...").remove('&').remove("..."));
-    QAction* verifySignature = menu.addAction(QIcon("://res/menu/check_signature.png"), tr("&Verify message...").remove('&').remove("..."));
+    QAction* signMessage = menu.addAction(QIcon("://res/menu/sign.png"), tr("Sign &Message...").remove('&').remove("..."));
+    QAction* verifySignature = menu.addAction(QIcon("://res/menu/check_signature.png"), tr("&Verify Message...").remove('&').remove("..."));
 
     QPoint poz = QCursor::pos();
     if (QWidget* w = qobject_cast<QWidget*>(sender()))

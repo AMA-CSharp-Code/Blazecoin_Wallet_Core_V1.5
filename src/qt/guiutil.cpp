@@ -1,6 +1,7 @@
 #include <QApplication>
 
 #include "guiutil.h"
+#include "dialog_move_handler.h"
 
 #include "blazecoinaddressvalidator.h"
 #include "walletmodel.h"
@@ -12,7 +13,12 @@
 #include <QDateTime>
 #include <QDoubleValidator>
 #include <QFont>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QVBoxLayout>
 #if QT_VERSION >= 0x050000
 #include <QUrlQuery>
 #else
@@ -437,7 +443,7 @@ bool SetStartOnSystemStartup(bool fAutoStart) { return false; }
 #endif
 
 HelpMessageBox::HelpMessageBox(QWidget *parent) :
-    QMessageBox(parent)
+    QDialog(parent)
 {
     header = tr("Blazecoin-Qt") + " " + tr("version") + " " +
         QString::fromStdString(FormatFullVersion()) + "\n\n" +
@@ -452,10 +458,113 @@ HelpMessageBox::HelpMessageBox(QWidget *parent) :
         "  -splash                " + tr("Show splash screen on startup (default: 1)") + "\n";
 
     setWindowTitle(tr("Blazecoin-Qt"));
-    setTextFormat(Qt::PlainText);
-    // setMinimumWidth is ignored for QMessageBox so put in non-breaking spaces to make it wider.
-    setText(header + QString(QChar(0x2003)).repeated(50));
-    setDetailedText(coreOptions + "\n" + uiOptions);
+    setWindowFlags(Qt::CustomizeWindowHint | Qt::FramelessWindowHint | Qt::Window);
+    setObjectName("HelpMessageBox");
+    setAttribute(Qt::WA_StyledBackground, true);
+    resize(700, 500);
+
+    // --- Custom dark title bar (wCaption) ---
+    QWidget *wCaption = new QWidget(this);
+    wCaption->setObjectName("wCaption");
+    wCaption->setFixedHeight(32);
+    wCaption->setStyleSheet("#wCaption { background-color: rgb(0, 0, 0); border: 1px solid #d80317; }");
+
+    QLabel *lbCaptionTitle = new QLabel(tr("Command-line Options"), wCaption);
+    QFont captionFont("Arial", 11);
+    captionFont.setStyleStrategy(QFont::PreferAntialias);
+    lbCaptionTitle->setFont(captionFont);
+    lbCaptionTitle->setStyleSheet("QLabel { color: #FFFFFF; background-color: transparent; }");
+
+    QPushButton *bClose = new QPushButton(wCaption);
+    bClose->setFixedSize(30, 30);
+    bClose->setFlat(true);
+    bClose->setStyleSheet(
+        "QPushButton {"
+        "  background-color: transparent;"
+        "  background-image: url(:/res/close_normal.png);"
+        "  background-repeat: no-repeat;"
+        "  background-position: center;"
+        "  border: 0px solid gray;"
+        "}"
+        "QPushButton:hover {"
+        "  background-color: #d80317;"
+        "  background-image: url(:/res/close_normal.png);"
+        "  background-repeat: no-repeat;"
+        "  background-position: center;"
+        "}"
+        "QPushButton:pressed:flat {"
+        "  background-color: #FF1A2E;"
+        "  background-image: url(:/res/close_normal.png);"
+        "  background-repeat: no-repeat;"
+        "  background-position: center;"
+        "}"
+    );
+    connect(bClose, SIGNAL(clicked()), this, SLOT(close()));
+
+    QHBoxLayout *captionLay = new QHBoxLayout(wCaption);
+    captionLay->setContentsMargins(13, 0, 0, 0);
+    captionLay->setSpacing(0);
+    captionLay->addWidget(lbCaptionTitle);
+    captionLay->addStretch();
+    captionLay->addWidget(bClose);
+
+    wCaption->installEventFilter(new DialogMoveHandler(this));
+
+    // --- Body: header label + scrollable help text + OK button ---
+    QLabel *lbHeader = new QLabel(header, this);
+    lbHeader->setWordWrap(true);
+
+    QTextEdit *txtBody = new QTextEdit(this);
+    txtBody->setReadOnly(true);
+    txtBody->setPlainText(coreOptions + "\n" + uiOptions);
+    txtBody->setLineWrapMode(QTextEdit::NoWrap);
+
+    QPushButton *bOk = new QPushButton(tr("OK"), this);
+    connect(bOk, SIGNAL(clicked()), this, SLOT(accept()));
+
+    QHBoxLayout *btnRow = new QHBoxLayout();
+    btnRow->addStretch();
+    btnRow->addWidget(bOk);
+    btnRow->addStretch();
+
+    QVBoxLayout *body = new QVBoxLayout();
+    body->setContentsMargins(14, 12, 14, 14);
+    body->setSpacing(10);
+    body->addWidget(lbHeader);
+    body->addWidget(txtBody);
+    body->addLayout(btnRow);
+
+    QVBoxLayout *root = new QVBoxLayout(this);
+    root->setContentsMargins(0, 0, 0, 0);
+    root->setSpacing(0);
+    root->addWidget(wCaption);
+    root->addLayout(body);
+
+    // Dark theme to match the rest of the wallet.
+    setStyleSheet(
+        "#HelpMessageBox { background-color: rgb(0, 0, 0); border: 1px solid #d80317; }"
+        "QLabel { color: #FFFFFF; }"
+        "QTextEdit, QPlainTextEdit {"
+        "  background-color: rgba(0, 0, 0, 200);"
+        "  color: #FFFFFF;"
+        "  border: 1px solid #d80317;"
+        "  selection-background-color: rgba(216, 3, 23, 120);"
+        "  selection-color: #FFFFFF;"
+        "}"
+        "QPushButton {"
+        "  background-color: rgba(0, 0, 0, 200);"
+        "  color: #FFFFFF;"
+        "  border: 1px solid #d80317;"
+        "  padding: 4px 14px;"
+        "  min-height: 22px;"
+        "  min-width: 70px;"
+        "}"
+        "QPushButton:hover { background-color: #d80317; }"
+        "QPushButton:pressed { background-color: #FF1A2E; }"
+        "QScrollBar:vertical { border: 0px; background: rgba(0,0,0,60); width: 9px; }"
+        "QScrollBar::handle:vertical { background: rgba(255,255,255,90); min-height: 20px; }"
+        "QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical { height: 0px; }"
+    );
 }
 
 void HelpMessageBox::printToConsole()

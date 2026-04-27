@@ -61,8 +61,6 @@ void OptionsModel::Init()
     if (!language.isEmpty())
         SoftSetArg("-lang", language.toStdString());
     bAllowSounds = settings.value("bAllowSounds", true).toBool();
-    bCheckUpdatesAtStartup = settings.value("bCheckUpdatesAtStartup", false).toBool();
-    bCheckUpdatesAtStartup = false;
 }
 
 void OptionsModel::Reset()
@@ -204,8 +202,6 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
                 return QVariant(bStartMiningAtStartup);
         case AllowSounds:
             return QVariant(bAllowSounds);
-        case CheckUpdatesAtStartup:
-            return QVariant(bCheckUpdatesAtStartup);
         default:
             return QVariant();
         }
@@ -295,10 +291,6 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case AllowSounds:
             bAllowSounds = value.toBool();
             settings.setValue("bAllowSounds", bAllowSounds);
-            break;
-        case CheckUpdatesAtStartup:
-            bCheckUpdatesAtStartup = value.toBool();
-            settings.setValue("bCheckUpdatesAtStartup", bCheckUpdatesAtStartup);
             break;
         default:
             break;

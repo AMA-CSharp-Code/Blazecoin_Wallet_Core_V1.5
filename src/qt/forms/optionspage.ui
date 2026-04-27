@@ -268,7 +268,7 @@
 }</string>
         </property>
         <property name="text">
-         <string>Common settings, Network</string>
+         <string>Common Settings, Network</string>
         </property>
        </widget>
       </item>
@@ -474,26 +474,6 @@ QCheckBox::indicator:checked:pressed {
                </property>
                <property name="text">
                 <string>&amp;Allow sounds</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkUpdatesAtStartup">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="toolTip">
-                <string/>
-               </property>
-               <property name="text">
-                <string>&amp;Check updates at startup</string>
                </property>
               </widget>
              </item>

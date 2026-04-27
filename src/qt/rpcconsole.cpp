@@ -1,5 +1,6 @@
 #include "rpcconsole.h"
 #include "ui_rpcconsole.h"
+#include "dialog_move_handler.h"
 
 #include "clientmodel.h"
 #include "blazecoinrpc.h"
@@ -192,6 +193,11 @@ RPCConsole::RPCConsole(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Frameless: the wCaption strip in the .ui replaces the OS title bar.
+    setWindowFlags(Qt::CustomizeWindowHint | Qt::FramelessWindowHint | Qt::Window);
+    ui->wCaption->installEventFilter(new DialogMoveHandler(this));
+    connect(ui->bClose, SIGNAL(clicked()), this, SLOT(close()));
+
     ConfigureMessagesTab();
 
 #ifndef Q_OS_MAC
@@ -289,6 +295,7 @@ void RPCConsole::setClientModel(ClientModel *model)
         ui->startupTime->setText(model->formatClientStartupTime());
 
         setNumConnections(model->getNumConnections());
+        setNumBlocks(model->getNumBlocks(), model->getNumBlocksOfPeers());
         ui->isTestNet->setChecked(model->isTestNet());
     }
 }
