@@ -24,7 +24,7 @@
    on QMainWindow. */
 
 QMenu {
-    background-color: #9e000f;
+    background-color: #000000;
     border: 0px solid black;
 }
 
@@ -35,7 +35,7 @@ QMenu::item {
 }
 
 QMenu::item:selected {
-    background-color: #0099СС;
+    background-color: #d80317;
 	color: #FFFFFF;
     border: none;
 }

@@ -18,6 +18,8 @@
 | 2026-04-27 | §13.4 (new), §13.5 (new) | EditAddress dialog dark-mode finish: outer `QDialog` and `wCaption` switched from blue `rgb(0, 82, 174)` to black, `picEdit` and `picAdd` indicator icons recoloured red, "Receiving Address" capitalisation; close X recipe rewritten to `background-image:` + `background-color:` so the red hover overlay paints below the white X glyph (the QSS `image:` property paints in a different z-order and was being covered by `background-color:`). |
 | 2026-04-27 | §13.6 (new) | Build-system note: MSBuild's custom-build step does not reliably re-invoke `rcc` when only a referenced PNG changes — it tracks the `.qrc` and the input PNG list snapshot, but timestamp updates inside an unchanged-list PNG are missed. Cure is to run `rcc.exe` by hand (one invocation per `.qrc` — `res.qrc` and `blazecoin.qrc` are separate compilation units that must not collide on `-o`). |
 | 2026-04-27 | §13.7 (new) | Encrypt Wallet (askpassphrasedialog), Sign Message, Verify Message dark-mode finish: outer `QDialog` and `wCaption`/`wHeader` switched to black; `encrypt.png`, `change_pass.png`, `sign_message_icon.png`, `verify_sign.png` recoloured red `#d80317`; "Encrypt wallet" → "Encrypt Wallet"; default `QLabel { color: #000000 }` flipped to white in askpassphrasedialog so labels read on the dark frame. |
+| 2026-04-28 | §13.8 (new) | Branding refresh: splash redesigned around the new neon-red shield artwork with a centred "BlazeCoin" caption baked into the PNG (split-colour: `Blaze` `#e64619` / `Coin` white). Header coin in `blazecoin-logo.png` replaced with the phoenix-medallion artwork, circle-cropped to match the original coin shape; word "Blazecoin" alongside it nudged down 4 px to sit lower against the new coin. Top-right `wallet-header.jpg` corner icon swapped from the small flame-shield to the same neon shield (28→36 px), brightness-keyed so the dark binary-haze background of the source PNG renders transparent over the header gradient; canvas widened from 828→845 px so the icon sits visibly inside the wallet's right margin instead of being clipped by the rounded corner mask. |
+| 2026-04-28 | §13.9 (new) | Dropdown menus (`File`, `Operations`, `Settings`) restyled: `QMenu { background-color }` flipped from red `#9e000f` to solid black; `QMenu::item:selected` background fixed (was `#0099СС` — invalid colour because of two Cyrillic 'С' characters that survived as literal text into Qt's parser, falling back to default highlight blue) → red `#d80317` with white text. Per-action `QIcon` arguments removed from `Exit` (File menu) and `Sign Message` / `Verify Message` (Operations menu) so all entries align to the same left edge. |
 | 2026-04-27 | §13.8 (new) | Close-X (bClose) `background-image` recipe rolled out across all five remaining dialogs (askpassphrasedialog, addressbookpage, aboutdialog, signverifymessagedialog, message_box_dialog) so hover paints red bg under the white X glyph instead of `image:` over `background-color`. |
 | 2026-04-27 | §13.9 (new) | Options page (Common settings + Network) recoloured: `wServiceMessagesHeader_4` strip black, `wContainer` `rgba(0,0,0,180)`, blue text → white, blue accent line → red, buttons restyled like other dialogs, `settings_icon.png` recoloured red. QCheckBox given small `padding: 1px 0; min-height: 14px` to ease the Common-section text clipping that existed in the original wallet. The "Optional transaction fee per kB…" `showNotification(...)` banner in `optionspage.cpp` removed. "Pay transaction fee" → "Pay Optional Transaction Fee". |
 | 2026-04-27 | §13.10 (new) | "Check updates at startup" feature removed. The checkbox was permanently `enabled=false` in the .ui, the model forced `bCheckUpdatesAtStartup = false` regardless of saved setting, and `getCheckUpdatesAtStartup()` was never called from anywhere — pure UI placeholder for an unimplemented feature. Removed: the `QCheckBox` widget; `OptionsModel::CheckUpdatesAtStartup` enum entry, getter, member; `Init()` / `data()` / `setData()` cases; mapper line and `setCheckUpdatesAtStartup()` setter on `OptionsDialog`. |
@@ -738,6 +740,59 @@ splash/icon `.cpp` with `res.qrc` content and produce a broken splash. The
 |--------|---------|------|
 | `blazecoin.qrc` | `blazecoin` | `release/qrc_blazecoin.cpp` |
 | `res.qrc` | `res` | `release/qrc_res.cpp` |
+
+### 13.8 Branding refresh — splash and header logos
+
+The Bitcoin-era splash and the `:/res/blazecoin-logo.png` header banner
+were both rebuilt around new neon-red artwork that ships alongside the
+codebase under `Qt Images for GUI/`. The work spans three resource files:
+
+| File | Role | Change |
+|------|------|--------|
+| `src/qt/res/images/splash.png` (+ `splash_testnet.png`) | First-run splash screen | New shield artwork composited at 512×512 onto a 512×560 canvas; `BlazeCoin` caption rendered underneath at y=420 in 64 pt Arial Bold, split-colour (`Blaze` `#e64619`, `Coin` white) |
+| `src/qt/res/blazecoin-logo.png` | Header coin + wordmark (`mainwindow.ui` line 823, `:/res/blazecoin-logo.png`) | Coin replaced with the new phoenix medallion, circle-cropped (`GraphicsPath.AddEllipse` clip), 75×75, 8 px left margin, 2 px top margin (so it isn't clipped by the rounded-corner mask on `wHeader`); the original "Blazecoin" wordmark on the right was shifted down 4 px to balance under the new coin |
+| `src/qt/res/wallet-header.jpg` | Header background bitmap (`mainwindow.ui` line 490) | Top-right flame-shield icon replaced with the new neon shield. The replacement is non-trivial because the source PNG has a *dark binary-haze background*, not transparency: brightness-keyed alpha (R·0.5 + G·0.3 + B·0.2 with a 30/80 cutoff) is computed at composite time so only the bright shield + glow paint over the gradient. Canvas was widened from 828→845 px (the `wHeader` widget defaults to 902 px wide; the JPG tiles, so a wider canvas shifts the icon further right within the visible tile). Final icon: 36 px, right margin 4 px, top margin 2 px. |
+
+Both `blazecoin.qrc` and `res.qrc` had to be re-rcc'd (see §13.6). The
+in-memory transparency keying for the header icon is the cleanest way to
+avoid the original problem we hit on the first attempt — pasting the
+source PNG directly drew an opaque dark rectangle over the gradient
+because the binary-code halo is *almost* black but not zero alpha.
+
+### 13.9 Dropdown menu restyle — File / Operations / Settings
+
+The menu bar dropdowns were red on a dark wallet, which clashed. Two
+edits in `src/qt/forms/mainwindow.ui`:
+
+```css
+QMenu {
+    background-color: #000000;   /* was #9e000f (dark red) */
+    border: 0px solid black;
+}
+
+QMenu::item:selected {
+    background-color: #d80317;   /* was #0099СС — see note below */
+    color: #FFFFFF;
+}
+```
+
+**Cyrillic-letter colour bug.** The previous selected-item background
+read as `#0099CC` to a human eye but the trailing two characters were
+the *Cyrillic capital С* (U+0421), not Latin C (U+0043). Qt's QSS
+colour parser only accepts ASCII hex, so the value silently fell back
+to the platform default highlight (Windows blue). Replacing the
+non-ASCII chars and switching the colour to the wallet's accent red
+both resolves the bug and harmonises with the rest of the theme.
+
+**Icon strip in `blazecoingui.cpp`.** The dynamically built menus
+opened by `menuFileRequested()` and `menuOperationsRequested()` had
+three actions with leading `QIcon` arguments — `Exit` in the File
+menu (`://res/menu/menu_exit.png`), `Sign Message`
+(`://res/menu/sign.png`) and `Verify Message`
+(`://res/menu/check_signature.png`) in the Operations menu. The
+remaining seven actions had no icon, so the menus rendered with an
+inconsistent left margin. Removing the three `QIcon` arguments lets
+all entries align to the same text gutter.
 
 ---
 

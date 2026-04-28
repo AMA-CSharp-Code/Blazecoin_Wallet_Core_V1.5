@@ -1097,7 +1097,7 @@ void BlazecoinGUI::menuFileRequested()
     QAction* qaBackupWallet = menu.addAction(tr("Backup Wallet"));
     QAction* qaImportWallet = menu.addAction(tr("Import Wallet"));
     QAction* exportData = menu.addAction(tr("&Export...").remove('&').remove("..."));
-    QAction* exitApp = menu.addAction(QIcon("://res/menu/menu_exit.png"), tr("E&xit").remove('&'));
+    QAction* exitApp = menu.addAction(tr("E&xit").remove('&'));
 
     QPoint poz = QCursor::pos();
     if (QWidget* w = qobject_cast<QWidget*>(sender()))
@@ -1146,8 +1146,8 @@ void BlazecoinGUI::menuOperationsRequested()
     QAction* encryptWallet = menu.addAction(tr("&Encrypt Wallet...").remove('&').remove("..."));
     QAction* mining = menu.addAction(tr("Mining"));
     QAction* changePassword = menu.addAction(tr("&Change Passphrase...").remove('&').remove("..."));
-    QAction* signMessage = menu.addAction(QIcon("://res/menu/sign.png"), tr("Sign &Message...").remove('&').remove("..."));
-    QAction* verifySignature = menu.addAction(QIcon("://res/menu/check_signature.png"), tr("&Verify Message...").remove('&').remove("..."));
+    QAction* signMessage = menu.addAction(tr("Sign &Message...").remove('&').remove("..."));
+    QAction* verifySignature = menu.addAction(tr("&Verify Message...").remove('&').remove("..."));
 
     QPoint poz = QCursor::pos();
     if (QWidget* w = qobject_cast<QWidget*>(sender()))
