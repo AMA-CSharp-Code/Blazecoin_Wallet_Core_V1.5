@@ -321,12 +321,12 @@ QLabel {
       <property name="styleSheet">
        <string notr="true"> QScrollBar:vertical {
      border: 0px solid grey;
-     background: white;
+     background: rgba(0, 0, 0, 60);
      width: 9px;
      margin: 15px 0px 0 0px;
  }
  QScrollBar::handle:vertical {
-     background: #D8DFE9;
+     background: rgba(255, 255, 255, 90);
      min-width: 20px;
  }
 QScrollBar::sub-line:vertical {
@@ -335,12 +335,13 @@ QScrollBar::sub-line:vertical {
 }
 
 QHeaderView {
-	background-color: rgba(0, 0, 0, 180);
+	background-color: transparent;
 	font-size: 10;
 	text-align:left;
+color: #FFFFFF;
 }
 QHeaderView::section {
-    background-color: rgba(0, 0, 0, 180);
+    background-color: transparent;
     color: #FFFFFF;
     padding-left: 5px;
     border: 0px solid #6c6c6c;
@@ -357,13 +358,10 @@ QHeaderView::up-arrow {
 }
 
 QTableView {
-	border: 0px solid #ededed;
-	selection-background-color: #ebebeb;
-	selection-color: black;
-}
-
-#transactionView {
-	color: black;
+	background-color: transparent;
+	selection-background-color: rgba(255, 255, 255, 40);
+	selection-color: #FFFFFF;
+	color: #FFFFFF;
 }</string>
       </property>
       <property name="frameShape">

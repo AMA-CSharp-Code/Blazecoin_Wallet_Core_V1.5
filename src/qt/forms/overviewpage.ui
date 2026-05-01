@@ -841,7 +841,7 @@ color: white;
         <property name="styleSheet">
          <string notr="true">#wLastTransactionsContainer {
 	background-color: rgba(0, 0, 0, 180);
-	color: #FFFFFF;
+	color: black;
 }</string>
         </property>
         <widget class="QTableView" name="tableLastTransactionView">

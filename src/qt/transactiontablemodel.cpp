@@ -563,7 +563,7 @@ QVariant TransactionTableModel::data(const QModelIndex &index, int role) const
 //        {
 //            return addressColor(rec);
 //        }
-        return QColor(qRgb(0, 0, 0));
+        return QColor(qRgb(255, 255, 255));
         break;
     case TypeRole:
         return rec->type;
