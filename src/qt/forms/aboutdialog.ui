@@ -27,11 +27,11 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QLabel {
-	color: #000000;
+	color: #FFFFFF;
 }
 
 QDialog {
-	background-color: rgb(158, 0, 15);
+	background-color: rgb(0, 0, 0);
 }
 
 </string>
@@ -57,7 +57,7 @@ QDialog {
      <property name="styleSheet">
       <string notr="true">#frame {
 	background-color: rgba(0, 0, 0, 180);
-    border-style:none;
+	border: 1px solid #d80317;
 }</string>
      </property>
      <property name="frameShape">
@@ -98,7 +98,8 @@ QDialog {
         </property>
         <property name="styleSheet">
          <string notr="true">#wCaption {
-	background-color:  rgb(158, 0, 15);
+	background-color: rgb(0, 0, 0);
+	border-bottom: 1px solid #d80317;
 }</string>
         </property>
         <property name="is_header" stdset="0">
@@ -175,7 +176,7 @@ QDialog {
 }</string>
            </property>
            <property name="text">
-            <string>Information about program</string>
+            <string>Information About Program</string>
            </property>
           </widget>
          </item>
@@ -540,7 +541,7 @@ This product includes software developed by the OpenSSL Project for use in the O
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton {
-	background-color: #9e6b70;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -550,11 +551,11 @@ This product includes software developed by the OpenSSL Project for use in the O
 }
 
 QPushButton:hover {
-	background-color: #ff051d;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #ff051d;
+	background-color: #d80317;
 }</string>
            </property>
            <property name="text">

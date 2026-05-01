@@ -592,17 +592,6 @@ QPushButton:!enabled {
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="showQRCode">
-       <property name="text">
-        <string>Show &amp;QR Code</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../blazecoin.qrc">
-         <normaloff>:/icons/qrcode</normaloff>:/icons/qrcode</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="signMessage">
        <property name="enabled">
         <bool>true</bool>

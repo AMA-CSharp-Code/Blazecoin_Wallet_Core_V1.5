@@ -16,6 +16,12 @@ win32-msvc* {
 CONFIG += no_include_pwd
 CONFIG += thread
 
+# Pin C++14 for MinGW/GCC: avoids std::filesystem visibility (GCC 15 default is C++17)
+# which conflicts with boost::filesystem under `using namespace std; using namespace boost;`.
+*-g++ {
+    QMAKE_CXXFLAGS += -std=gnu++14
+}
+
 # for boost 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
@@ -55,7 +61,10 @@ contains(RELEASE, 1) {
 # MinGW-only linker flags (MSVC has /DYNAMICBASE /NXCOMPAT /LARGEADDRESSAWARE on by default)
 win32-g++ {
     QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
-    QMAKE_LFLAGS *= -Wl,--large-address-aware
+    # --large-address-aware is 32-bit-only; not supported by 64-bit MinGW ld
+    !contains(QMAKE_HOST.arch, x86_64) {
+        QMAKE_LFLAGS *= -Wl,--large-address-aware
+    }
 }
 
 # use: qmake "USE_QRCODE=1"
@@ -157,19 +166,19 @@ win32-msvc* {
     # MinGW / Unix: build via make as before
     LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
     !win32 {
-        genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a
+        genleveldb.commands = cd \"$$PWD/src/leveldb\" && CC=$$QMAKE_CC CXX=$$QMAKE_CXX $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a
     } else {
         isEmpty(QMAKE_RANLIB) {
             QMAKE_RANLIB = $$replace(QMAKE_STRIP, strip, ranlib)
         }
         LIBS += -lshlwapi
-        genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libleveldb.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libmemenv.a
+        genleveldb.commands = cd \"$$PWD/src/leveldb\" && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB \"$$PWD/src/leveldb/libleveldb.a\" && $$QMAKE_RANLIB \"$$PWD/src/leveldb/libmemenv.a\"
     }
     genleveldb.target = $$PWD/src/leveldb/libleveldb.a
     genleveldb.depends = FORCE
     PRE_TARGETDEPS += $$PWD/src/leveldb/libleveldb.a
     QMAKE_EXTRA_TARGETS += genleveldb
-    QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) clean
+    QMAKE_CLEAN += \"$$PWD/src/leveldb/libleveldb.a\"; cd \"$$PWD/src/leveldb\" ; $(MAKE) clean
 }
 
 # regenerate src/build.h
@@ -510,7 +519,8 @@ win32-msvc* {
     LIBS += -lssl -lcrypto -ldb_cxx$$BDB_LIB_SUFFIX
     # -lgdi32 has to happen after -lcrypto (see  #681)
     win32:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
-    LIBS += -lboost_system$$BOOST_LIB_SUFFIX -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
+    # boost_system is header-only since Boost 1.69 (MSYS2 ships post-1.69)
+    LIBS += -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
     win32:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
     macx:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
 }

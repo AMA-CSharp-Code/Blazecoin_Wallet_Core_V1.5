@@ -36,10 +36,6 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     ui->deleteButton->setIcon(QIcon());
 #endif
 
-#ifndef USE_QRCODE
-    ui->showQRCode->setVisible(false);
-#endif
-
     switch(mode)
     {
     case ForSending:
@@ -74,7 +70,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     QAction *copyAddressAction = new QAction(tr("&Copy Address"), this);
     QAction *copyLabelAction = new QAction(tr("Copy &Label"), this);
     QAction *editAction = new QAction(tr("&Edit"), this);
-    QAction *showQRCodeAction = new QAction(ui->showQRCode->text(), this);
+    QAction *showQRCodeAction = new QAction(tr("Show &QR Code"), this);
     QAction *signMessageAction = new QAction(tr("Sign &Message"), this);
     QAction *verifyMessageAction = new QAction(tr("&Verify Message"), this);
     deleteAction = new QAction(tr("&Delete"), this);
@@ -291,12 +287,10 @@ void AddressBookPage::selectionChanged()
             break;
         }
         ui->copyToClipboard->setEnabled(true);
-        ui->showQRCode->setEnabled(true);
     }
     else
     {
         ui->deleteButton->setEnabled(false);
-        ui->showQRCode->setEnabled(false);
         ui->copyToClipboard->setEnabled(false);
         ui->signMessage->setEnabled(false);
         ui->verifyMessage->setEnabled(false);
