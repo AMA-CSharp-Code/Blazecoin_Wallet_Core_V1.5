@@ -776,6 +776,10 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
     int ret = 0;
 
     CBlockIndex* pindex = pindexStart;
+    int nStartHeight = pindexStart ? pindexStart->nHeight : 0;
+    int nEndHeight = pindexBest ? pindexBest->nHeight : nStartHeight;
+    int nTotal = std::max(1, nEndHeight - nStartHeight);
+    int64 nLastReport = GetTimeMillis();
     {
         LOCK(cs_wallet);
         while (pindex)
@@ -787,6 +791,17 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                 if (AddToWalletIfInvolvingMe(tx.GetHash(), tx, &block, fUpdate))
                     ret++;
             }
+
+            int64 nNow = GetTimeMillis();
+            if (nNow - nLastReport >= 500)
+            {
+                int nDone = pindex->nHeight - nStartHeight;
+                int nPct = std::min(100, std::max(0, (int)((int64)nDone * 100 / nTotal)));
+                uiInterface.InitMessage(strprintf(_("Rescanning... block %d of %d (%d%%)"),
+                                                  pindex->nHeight, nEndHeight, nPct));
+                nLastReport = nNow;
+            }
+
             pindex = pindex->pnext;
         }
     }
