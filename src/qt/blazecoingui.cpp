@@ -33,6 +33,9 @@
 #include "guiutil.h"
 #include "rpcconsole.h"
 #include "ui_interface.h"
+
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 #include "main.h"
 #include "init.h"
 #include "util.h"
@@ -115,6 +118,18 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
     m_bgTile = QPixmap(":/res/blazecoin-bg.png");
 
     ui->wCaption->installEventFilter(new DialogMoveHandler(this));
+
+    // Pulsing green status dot in the top-left header
+    QGraphicsOpacityEffect *dotEffect = new QGraphicsOpacityEffect(ui->lbStatusDot);
+    dotEffect->setOpacity(1.0);
+    ui->lbStatusDot->setGraphicsEffect(dotEffect);
+    QPropertyAnimation *dotAnim = new QPropertyAnimation(dotEffect, "opacity", this);
+    dotAnim->setDuration(2400);
+    dotAnim->setStartValue(0.25);
+    dotAnim->setKeyValueAt(0.5, 1.0);
+    dotAnim->setEndValue(0.25);
+    dotAnim->setLoopCount(-1);
+    dotAnim->start();
 
 #ifndef Q_OS_MAC
     if (!fIsTestnet)
