@@ -1,5 +1,6 @@
 /*
  * W.J. van der Laan 2011-2012
+ * Andrew Mason 2026 (V1.5 splash + dark-mode dialogs)
  */
 
 #include <QApplication>

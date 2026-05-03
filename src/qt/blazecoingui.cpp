@@ -4,6 +4,7 @@
  * W.J. van der Laan 2011-2012
  * The Worldcoin Developers 2011-2012
  * Blazecoin Developers 2014
+ * Andrew Mason 2026 (V1.5 redesign)
  */
 
 #include "blazecoingui.h"
