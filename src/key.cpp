@@ -203,7 +203,9 @@ public:
     bool Sign(const uint256 &hash, std::vector<unsigned char>& vchSig) {
         unsigned int nSize = ECDSA_size(pkey);
         vchSig.resize(nSize); // Make sure it is big enough
-        assert(ECDSA_sign(0, (unsigned char*)&hash, sizeof(hash), &vchSig[0], &nSize, pkey));
+        // NB: ECDSA_sign must be called outside assert() — NDEBUG elides it in Release.
+        if (!ECDSA_sign(0, (unsigned char*)&hash, sizeof(hash), &vchSig[0], &nSize, pkey))
+            return false;
         vchSig.resize(nSize); // Shrink to fit actual size
         return true;
     }
