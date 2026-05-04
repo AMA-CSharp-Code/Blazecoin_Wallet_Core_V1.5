@@ -1191,13 +1191,14 @@ void MapPort(bool)
 // Each pair gives a source name and a seed name.
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
+// V1.5: original blazeco.in seeds are defunct. pnSeed[] below carries the
+// hardcoded fallback IPs; users primarily bootstrap via the auto-written
+// blazecoin.conf addnodes.
 static const char *strMainNetDNSSeed[][2] = {
-	 {"seed.blazeco.in", "172.245.137.35"},
     {NULL, NULL}
 };
 
 static const char *strTestNetDNSSeed[][2] = {
-    {"seedtest.blazeco.in", "testnet.seedtest.blazeco.in"},
     {NULL, NULL}
 };
 
@@ -1244,9 +1245,13 @@ void ThreadDNSAddressSeed()
 
 
 
+// V1.5: known-good production peers, little-endian uint32 encoded.
+//   0xABB30F55 -> 85.15.179.171
+//   0xD610CE5B -> 91.206.16.214
 unsigned int pnSeed[] =
 {
-	0xA2F337A6
+    0xABB30F55,
+    0xD610CE5B
 };
 
 void DumpAddresses()

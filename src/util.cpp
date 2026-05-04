@@ -1089,10 +1089,46 @@ boost::filesystem::path GetConfigFile()
     return pathConfigFile;
 }
 
+// V1.5: write a default blazecoin.conf on first launch. The original Blazecoin
+// DNS seed (seed.blazeco.in) and hardcoded pnSeed[] list are defunct, so a
+// fresh install with no peers.dat and no conf has no way to find peers. The
+// default file seeds two known-good production peers as addnodes.
+static void WriteDefaultConfigFile(const boost::filesystem::path& pathConfig)
+{
+    try {
+        boost::filesystem::create_directories(pathConfig.parent_path());
+        boost::filesystem::ofstream stream(pathConfig);
+        if (!stream.good())
+            return;
+        stream <<
+            "# Blazecoin V1.5 configuration\n"
+            "# This file was auto-created on first launch. Edit freely.\n"
+            "\n"
+            "# Bootstrap peers. Required for fresh installs because the\n"
+            "# original DNS seeds and hardcoded fallbacks are no longer\n"
+            "# online. Once peers.dat builds up these lines become optional.\n"
+            "addnode=85.15.179.171:55414\n"
+            "addnode=91.206.16.214:55414\n"
+            "\n"
+            "# Uncomment to enable the JSON-RPC server (loopback only).\n"
+            "#server=1\n"
+            "#rpcuser=username\n"
+            "#rpcpassword=changeme\n"
+            "#rpcallowip=127.0.0.1\n";
+    } catch (const boost::filesystem::filesystem_error&) {
+        // best-effort; if we can't write the default, the wallet still
+        // runs and the user can create the file manually.
+    }
+}
+
 void ReadConfigFile(map<string, string>& mapSettingsRet,
                     map<string, vector<string> >& mapMultiSettingsRet)
 {
-    boost::filesystem::ifstream streamConfig(GetConfigFile());
+    boost::filesystem::path pathConfig = GetConfigFile();
+    if (!boost::filesystem::exists(pathConfig))
+        WriteDefaultConfigFile(pathConfig);
+
+    boost::filesystem::ifstream streamConfig(pathConfig);
     if (!streamConfig.good())
         return; // No blazecoin.conf file is OK
 
