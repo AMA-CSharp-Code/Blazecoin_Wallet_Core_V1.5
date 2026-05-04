@@ -4,21 +4,21 @@
 
 ### Step 1: Setup MinGW Environment
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\Setup-MinGW-Environment.ps1
 ```
 **Then close and reopen PowerShell**
 
 ### Step 2: Install Dependencies
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\Install-Blazecoin-Dependencies-MSYS2.ps1
 ```
 **Then close and reopen PowerShell**
 
 ### Step 3: Compile Wallet
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\Compile-Blazecoin-V1.5.ps1
 ```
 
@@ -82,7 +82,7 @@ If you don't want to set up MinGW, you can:
 
 1. **Zip your modified source:**
    ```powershell
-   Compress-Archive -Path "C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src" -DestinationPath "Blazecoin_V1.5_Source.zip"
+   Compress-Archive -Path "C:\path\to\source\repos\Blazecoin_Core_V1.5\src" -DestinationPath "Blazecoin_V1.5_Source.zip"
    ```
 
 2. **Include this file:**
@@ -169,7 +169,7 @@ TOTAL:                 1-2 hours
 
 **Start with:**
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\Setup-MinGW-Environment.ps1
 ```
 

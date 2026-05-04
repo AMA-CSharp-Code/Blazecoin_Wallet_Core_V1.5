@@ -26,7 +26,7 @@ This guide helps you set up a complete MinGW build environment and compile Blaze
 Open PowerShell as **Administrator** and run:
 
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\Setup-MinGW-Environment.ps1
 ```
 
@@ -49,7 +49,7 @@ cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
 After Step 1 completes, **close and reopen PowerShell**, then run:
 
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\Install-Blazecoin-Dependencies-MSYS2.ps1
 ```
 
@@ -73,7 +73,7 @@ cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
 After dependencies are installed, **close and reopen PowerShell**, then run:
 
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\Compile-Blazecoin-V1.5.ps1
 ```
 
@@ -87,7 +87,7 @@ cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
 **What to expect:**
 - Daemon compilation: 10-30 minutes
 - GUI compilation: 15-40 minutes (optional)
-- Final files in: `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\compiled\`
+- Final files in: `C:\path\to\source\repos\Blazecoin_Core_V1.5\compiled\`
 
 ---
 
@@ -115,7 +115,7 @@ See `CHANGES_V1.5.md` for complete testing instructions.
 
 2. Start V1.5 wallet (TEST MODE):
    ```powershell
-   cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\compiled
+   cd C:\path\to\source\repos\Blazecoin_Core_V1.5\compiled
    .\blazecoind.exe -datadir=C:\blazecoin-data\BlazecoinV1.5
    ```
 
@@ -153,7 +153,7 @@ Dependencies not installed. Re-run `Install-Blazecoin-Dependencies-MSYS2.ps1`.
 
 You're in wrong directory. Navigate to:
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 ```
 
 ### Compilation takes forever
@@ -218,7 +218,7 @@ If the scripts don't work, you can do everything manually in MSYS2:
 | MinGW-w64 (standalone) | `C:\blazecoin-deps\mingw64\` |
 | MinGW-w64 (MSYS2) | `C:\msys64\mingw64\` |
 | Dependencies | `C:\blazecoin-deps\` |
-| Compiled binaries | `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\compiled\` |
+| Compiled binaries | `C:\path\to\source\repos\Blazecoin_Core_V1.5\compiled\` |
 
 ---
 

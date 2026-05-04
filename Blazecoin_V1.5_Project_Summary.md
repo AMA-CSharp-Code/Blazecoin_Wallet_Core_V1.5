@@ -9,7 +9,7 @@ The Blazecoin Core V1.5 upgrade project has been set up with all necessary docum
 ## What Was Done
 
 ### 1. Repository Cloned ✅
-- **Location:** `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\`
+- **Location:** `C:\path\to\source\repos\Blazecoin_Core_V1.5\`
 - **Source:** https://github.com/wpstudio/blazecoin
 - **Branch:** master
 - **Status:** Ready for modification
@@ -105,7 +105,7 @@ Separate Location/
 
 ## Key Files to Modify
 
-In the `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\` directory:
+In the `C:\path\to\source\repos\Blazecoin_Core_V1.5\` directory:
 
 ### Must Modify:
 1. **src/checkpoints.cpp** - Add new checkpoints

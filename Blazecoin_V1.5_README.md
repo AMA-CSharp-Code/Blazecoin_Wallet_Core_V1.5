@@ -14,7 +14,7 @@ Blazecoin_Website_MVC_Microservices/          (Your current .NET workspace)
 ├── Blazecoin_V1.5_README.md                  ← This file
 └── (other .NET projects)
 
-C:\Users\Andrew\source\repos\
+C:\path\to\source\repos\
 └── Blazecoin_Core_V1.5/                      ← C++ wallet source code (separate repo)
     ├── src/
     │   ├── checkpoints.cpp                   ← MODIFY: Add checkpoints
@@ -39,7 +39,7 @@ C:\Users\Andrew\source\repos\
 
 3. **Run the script:**
    ```powershell
-   cd C:\Users\Andrew\source\repos\Blazecoin_Website_MVC_Microservices
+   cd C:\path\to\source\repos\Blazecoin_Website_MVC_Microservices
    .\Get-CheckpointHashes.ps1
    ```
 
@@ -49,7 +49,7 @@ C:\Users\Andrew\source\repos\
 
 1. **Navigate to the C++ wallet directory:**
    ```powershell
-   cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+   cd C:\path\to\source\repos\Blazecoin_Core_V1.5
    ```
 
 2. **Open `src/checkpoints.cpp` in your editor:**
@@ -88,7 +88,7 @@ C:\Users\Andrew\source\repos\
 
 **Using MinGW (Recommended for Windows):**
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 mingw32-make -f Makefile.mingw
 ```
 
@@ -122,7 +122,7 @@ mingw32-make -f Makefile.mingw
 
 3. **Start V1.5 daemon:**
    ```powershell
-   cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+   cd C:\path\to\source\repos\Blazecoin_Core_V1.5
    .\blazecoind.exe -conf=C:\blazecoin-data\BlazecoinV1.5\blazecoin.conf -daemon
    ```
 
@@ -151,7 +151,7 @@ See the full guide in `Blazecoin_V1.5_Upgrade_Guide.md` for detailed deployment 
 
 The C++ wallet source code is in:
 ```
-C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\
+C:\path\to\source\repos\Blazecoin_Core_V1.5\
 ```
 
 This is **separate** from your .NET microservices workspace.

@@ -14,7 +14,7 @@ The original Blazecoin Core wallet (forked from Litecoin/Bitcoin) has several ha
 4. **Database initialization** - Possible LevelDB constraints
 
 ## Repository Location
-**C++ Wallet Source Code:** `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\`
+**C++ Wallet Source Code:** `C:\path\to\source\repos\Blazecoin_Core_V1.5\`
 
 ## Required Changes
 
@@ -106,7 +106,7 @@ static const int MAX_BLOCKINDEX_SIZE = 2000000;
 
 **PowerShell Search Command:**
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5\src
 Select-String -Path *.h,*.cpp -Pattern "MAX.*HEADER|2000000|MAX.*BLOCK.*HEIGHT" | Select-Object Filename, LineNumber, Line
 ```
 
@@ -162,7 +162,7 @@ Update version constants from 0.8.6.2 to 1.5.0.0:
 
 ### Option A: Using Qt Creator (Easiest for GUI Wallet)
 ```bash
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 qmake blazecoin-qt.pro
 make
 ```
@@ -174,7 +174,7 @@ make
 
 ### Option C: Using MinGW (Recommended for Windows)
 ```bash
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 mingw32-make -f Makefile.mingw
 ```
 
@@ -219,7 +219,7 @@ printtoconsole=0
 
 3. **Start V1.5 Daemon:**
 ```powershell
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 .\blazecoind.exe -conf=C:\blazecoin-data\BlazecoinV1.5\blazecoin.conf -daemon
 ```
 

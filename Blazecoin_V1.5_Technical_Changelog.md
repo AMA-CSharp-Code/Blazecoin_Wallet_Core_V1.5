@@ -434,7 +434,7 @@ blazecoin-qt.pro          MSVC-aware: gated GCC-only flags, MSVC defines
 
 ### 9.2 RPC throughput benchmark (added 2026-04-27)
 
-Direct head-to-head between V1.5 (MSVC 2022 build) and stock 0.8.6.2 (the 2019 MinGW production binary at `C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe`). Both daemons running, both at chain tip (4,105,596). 1000 calls per HTTP request via JSON-RPC batching, best of 3 runs:
+Direct head-to-head between V1.5 (MSVC 2022 build) and stock 0.8.6.2 (the 2019 MinGW production binary at `C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe`). Both daemons running, both at chain tip (4,105,596). 1000 calls per HTTP request via JSON-RPC batching, best of 3 runs:
 
 | Operation | V1.5 (MSVC 2022) | Stock 0.8.6.2 (2019) | V1.5 advantage |
 |-----------|------------------:|---------------------:|---------------:|
@@ -815,8 +815,8 @@ all entries align to the same text gutter.
 
 ## 12. Known follow-ups
 
-- **Cross-version peer test** paused at ~107K blocks. Resume by relaunching the test peer (stock 0.8.6.2 from `C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe`) with `-datadir=C:\blazecoin-data\TestPeer`. It will continue downloading from V1.5 toward 4.1M tip.
-- **Sanitize local paths** in `MSYS2-Setup-QuickStart.md` and `OPENSSL_COMPATIBILITY_ISSUE.md` (a few `C:\Users\Andrew\...` strings) if the repo is ever made public.
+- **Cross-version peer test** paused at ~107K blocks. Resume by relaunching the test peer (stock 0.8.6.2 from `C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe`) with `-datadir=C:\blazecoin-data\TestPeer`. It will continue downloading from V1.5 toward 4.1M tip.
+- **Sanitize local paths** in `MSYS2-Setup-QuickStart.md` and `OPENSSL_COMPATIBILITY_ISSUE.md` (a few `C:\path\to\...` strings) if the repo is ever made public.
 - **Translation files** (`src/qt/locale/*.qm`) are committed as zero-byte placeholders. To regenerate real translations, install vcpkg's `qt5-tools` and re-run `qmake` without the `!win32-msvc*` guard around the `lrelease` block in `blazecoin-qt.pro`.
 - **`USE_UPNP` in the GUI build** is currently disabled (the bundled `net.cpp` UPNP code uses an older miniupnpc API). The daemon build also doesn't define it. Re-enable by updating the `upnpDiscover()` and `UPNP_GetValidIGD()` call sites to the modern signatures.
 - **`USE_QRCODE`** disabled — receive-address QR codes aren't built. Add `qrencode` to vcpkg and pass `USE_QRCODE=1` to qmake to re-enable.

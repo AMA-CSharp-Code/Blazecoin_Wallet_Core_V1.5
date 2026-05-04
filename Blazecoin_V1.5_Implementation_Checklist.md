@@ -8,7 +8,7 @@ Use this checklist to track your progress through the upgrade process.
 
 - [ ] Production Blazecoin daemon is running and fully synced
 - [ ] Confirmed current block height is 4,000,000+ blocks
-- [ ] C++ wallet source code cloned to: `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\`
+- [ ] C++ wallet source code cloned to: `C:\path\to\source\repos\Blazecoin_Core_V1.5\`
 - [ ] All documentation files created and reviewed:
   - [ ] `Blazecoin_V1.5_README.md`
   - [ ] `Blazecoin_V1.5_Upgrade_Guide.md`
@@ -69,7 +69,7 @@ Use this checklist to track your progress through the upgrade process.
 - [ ] Berkeley DB 4.8 installed
 
 ### Build Process
-- [ ] Navigated to: `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\`
+- [ ] Navigated to: `C:\path\to\source\repos\Blazecoin_Core_V1.5\`
 - [ ] **Method used:** (Circle one): MinGW / Visual Studio / Qt Creator
 - [ ] Ran build command: `________________________________`
 - [ ] Build completed successfully

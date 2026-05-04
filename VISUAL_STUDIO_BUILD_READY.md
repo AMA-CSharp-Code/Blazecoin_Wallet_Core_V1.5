@@ -64,11 +64,11 @@ OS_WIN                       // Operating system: Windows
 
 ### 7. Include Directories
 ```
-C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src
-C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src\json
-C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src\leveldb
-C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src\leveldb\include
-C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src\leveldb\helpers\memenv
+C:\path\to\source\repos\Blazecoin_Core_V1.5\src
+C:\path\to\source\repos\Blazecoin_Core_V1.5\src\json
+C:\path\to\source\repos\Blazecoin_Core_V1.5\src\leveldb
+C:\path\to\source\repos\Blazecoin_Core_V1.5\src\leveldb\include
+C:\path\to\source\repos\Blazecoin_Core_V1.5\src\leveldb\helpers\memenv
 C:\vcpkg\installed\x64-windows\include
 ```
 
@@ -103,7 +103,7 @@ C:\vcpkg\installed\x64-windows\lib
 
 1. **Open the solution:**
    ```powershell
-   Start-Process "C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\Blazecoin.sln"
+   Start-Process "C:\path\to\source\repos\Blazecoin_Core_V1.5\Blazecoin.sln"
    ```
 
 2. **Select configuration:**
@@ -116,7 +116,7 @@ C:\vcpkg\installed\x64-windows\lib
 
 4. **Output location:**
    ```
-   C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe
+   C:\path\to\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe
    ```
 
 ### Method 2: Build from Command Line (MSBuild)
@@ -124,7 +124,7 @@ C:\vcpkg\installed\x64-windows\lib
 ```powershell
 # Open Visual Studio Developer PowerShell
 # Then run:
-cd "C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5"
+cd "C:\path\to\source\repos\Blazecoin_Core_V1.5"
 msbuild Blazecoin.sln /p:Configuration=Release /p:Platform=x64 /m
 ```
 
@@ -205,13 +205,13 @@ After successful compilation, verify the executable:
 
 ```powershell
 # Check file exists
-Test-Path "C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe"
+Test-Path "C:\path\to\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe"
 
 # Check file size (should be 2-5 MB typically)
-(Get-Item "C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe").Length / 1MB
+(Get-Item "C:\path\to\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe").Length / 1MB
 
 # Test basic execution (should show help text)
-& "C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe" --help
+& "C:\path\to\source\repos\Blazecoin_Core_V1.5\bin\x64\Release\blazecoind.exe" --help
 ```
 
 ---

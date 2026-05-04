@@ -49,7 +49,7 @@ Linux has easier access to correct OpenSSL versions:
 3. **Copy source to WSL:**
    ```powershell
    # From Windows PowerShell:
-   Copy-Item "C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5" "\\wsl$\Ubuntu\home\andrew\" -Recurse
+   Copy-Item "C:\path\to\source\repos\Blazecoin_Core_V1.5" "\\wsl$\Ubuntu\home\andrew\" -Recurse
    ```
 
 4. **Compile in WSL:**

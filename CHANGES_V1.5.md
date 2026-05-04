@@ -151,7 +151,7 @@ Date: April 23, 2026
 
 **Build Commands:**
 ```bash
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\src
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5\src
 mingw32-make -f makefile.mingw
 strip blazecoind.exe
 ```
@@ -308,8 +308,8 @@ blazecoind.exe -rpcport=55415 getpeerinfo
 4. **Deploy V1.5:**
    ```powershell
    # Replace old binaries with V1.5
-   Copy-Item "blazecoind.exe" "C:\Users\Andrew\Desktop\Blazecoin\blazecoind.exe" -Force
-   Copy-Item "blazecoin-qt.exe" "C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe" -Force
+   Copy-Item "blazecoind.exe" "C:\path\to\Desktop\Blazecoin\blazecoind.exe" -Force
+   Copy-Item "blazecoin-qt.exe" "C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe" -Force
    ```
 
 5. **Update Configuration:**
@@ -322,7 +322,7 @@ blazecoind.exe -rpcport=55415 getpeerinfo
 6. **Start V1.5:**
    ```powershell
    # Start V1.5 with production config
-   Start-Process "C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe" -ArgumentList "-datadir=C:\blazecoin-data\Production"
+   Start-Process "C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe" -ArgumentList "-datadir=C:\blazecoin-data\Production"
    
    # Or daemon mode:
    blazecoind.exe -datadir=C:\blazecoin-data\Production
@@ -370,13 +370,13 @@ If issues occur during production deployment:
 
 2. **Restore Old Binaries:**
    ```powershell
-   Copy-Item "C:\Backup\blazecoind_v0.8.6.2.exe" "C:\Users\Andrew\Desktop\Blazecoin\blazecoind.exe" -Force
-   Copy-Item "C:\Backup\blazecoin-qt_v0.8.6.2.exe" "C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe" -Force
+   Copy-Item "C:\Backup\blazecoind_v0.8.6.2.exe" "C:\path\to\Desktop\Blazecoin\blazecoind.exe" -Force
+   Copy-Item "C:\Backup\blazecoin-qt_v0.8.6.2.exe" "C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe" -Force
    ```
 
 3. **Restart Old Version:**
    ```powershell
-   Start-Process "C:\Users\Andrew\Desktop\Blazecoin\blazecoin-qt.exe" -ArgumentList "-datadir=C:\blazecoin-data\Production"
+   Start-Process "C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe" -ArgumentList "-datadir=C:\blazecoin-data\Production"
    ```
 
 4. **Verify Services:**
@@ -486,7 +486,7 @@ If issues occur during production deployment:
 
 **Source Code:**
 - Original: https://github.com/wpstudio/blazecoin
-- V1.5 (local): `C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5\`
+- V1.5 (local): `C:\path\to\source\repos\Blazecoin_Core_V1.5\`
 
 ---
 
@@ -506,7 +506,7 @@ Before compilation, verify:
 
 **Verification Command:**
 ```bash
-cd C:\Users\Andrew\source\repos\Blazecoin_Core_V1.5
+cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 git diff src/clientversion.h src/main.cpp src/checkpoints.cpp
 ```
 
