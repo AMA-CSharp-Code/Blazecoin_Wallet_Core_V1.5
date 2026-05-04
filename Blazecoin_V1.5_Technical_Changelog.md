@@ -322,8 +322,25 @@ assert(ok);
 | `main.cpp:1796` `ConnectBlock` | `view.SetBestBlock(...)` | Best-block pointer never updated |
 | `main.cpp:1887` `SetBestBlock` | `view.Flush()` | UTXO state never persisted to disk |
 | `wallet.cpp:1262` `CreateTransaction` | `reservekey.GetReservedKey(...)` | Wallet change-key reservation skipped |
+| `key.cpp:206` `CECKey::Sign` | `ECDSA_sign(...)` | Transactions silently signed with uninitialised buffer; sends rejected by `VerifyScript` and reported as `"Signing transaction failed"` |
 
 Other `assert(obj.IsValid())`, `assert(container.count(...))`, and `assert(bool_variable)` uses in the codebase are safe (no side effects) and were left alone.
+
+### 7.3 Fresh-install bootstrap (post-release fix in v1.5.0)
+
+Latent issue inherited from the original Blazecoin code, hidden as long as the project ran on machines that already had populated `peers.dat` and explicit `addnode=` lines. Surfaced when v1.5.0 was downloaded onto a clean machine for the first time: the wallet launched, sat at 0 peers indefinitely, and never synced.
+
+Root causes:
+
+1. **Dead DNS seed.** `seed.blazeco.in` has been NXDOMAIN for years. The literal-IP fallback `172.245.137.35:55414` listed alongside it in `strMainNetDNSSeed` is also offline.
+2. **Dead in-binary seed.** `pnSeed[]` in `src/net.cpp` had a single entry, `0xA2F337A6` → `166.55.243.162:55414`, which has been offline for years.
+3. **No conf, no addnodes.** A fresh install starts with no `blazecoin.conf`. The wallet never auto-creates one, so there's no `addnode=` line to fall back on.
+
+Fix (commit `a087b51`):
+
+- **`util.cpp` `ReadConfigFile`** now writes a default `blazecoin.conf` if none exists. The default seeds two known-good production peers as `addnode=` lines, plus commented-out RPC settings as a starting template. Visible to the user, editable, survives wallet restarts.
+- **`net.cpp` `pnSeed[]`** updated to the same two peers, little-endian uint32 encoded (`0xABB30F55` → `85.15.179.171`, `0xD610CE5B` → `91.206.16.214`). Kicks in if `addrman.size()==0` more than 60s after start, providing a belt-and-braces fallback if the conf is later deleted while `peers.dat` is also missing.
+- **Dead DNS seed entries** pruned from `strMainNetDNSSeed` and `strTestNetDNSSeed` to avoid 60s of pointless DNS lookups on every startup.
 
 ---
 

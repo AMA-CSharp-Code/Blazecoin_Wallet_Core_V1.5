@@ -106,13 +106,15 @@ mingw32-make -f Makefile.mingw
    mkdir C:\blazecoin-data\BlazecoinV1.5
    ```
 
-2. **Create config file:** `C:\blazecoin-data\BlazecoinV1.5\blazecoin.conf`
+2. **Config file** is auto-created on first launch at `<datadir>/blazecoin.conf`,
+   pre-seeded with two known-good `addnode=` peers and commented-out RPC
+   placeholders. Edit it freely if you want to enable RPC, change ports, or
+   add peers. A typical isolated-test conf looks like:
    ```ini
    rpcuser=blazecoin_v15_user
    rpcpassword=CHANGE_THIS_PASSWORD
    rpcport=55415
    port=55416
-   datadir=C:\blazecoin-data\BlazecoinV1.5
    txindex=1
    addnode=85.15.179.171:55414
    addnode=91.206.16.214:55414
