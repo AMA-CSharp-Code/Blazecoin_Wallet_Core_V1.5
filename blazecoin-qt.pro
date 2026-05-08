@@ -521,8 +521,7 @@ win32-msvc* {
     win32:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
     # boost_system is header-only since Boost 1.69 (MSYS2 ships post-1.69)
     LIBS += -lboost_filesystem$$BOOST_LIB_SUFFIX -lboost_program_options$$BOOST_LIB_SUFFIX -lboost_thread$$BOOST_THREAD_LIB_SUFFIX
-    win32:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
-    macx:LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
+    LIBS += -lboost_chrono$$BOOST_LIB_SUFFIX
 }
 
 contains(RELEASE, 1) {
