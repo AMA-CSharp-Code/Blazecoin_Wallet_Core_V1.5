@@ -4,6 +4,7 @@
  */
 
 #include <QApplication>
+#include <unistd.h>  // _exit
 
 #include "blazecoingui.h"
 #include "clientmodel.h"
@@ -124,6 +125,16 @@ int main(int argc, char *argv[])
 #endif
 
     Q_INIT_RESOURCE(blazecoin);
+
+#if QT_VERSION >= 0x050600 && QT_VERSION < 0x060000
+    // Render at native Retina resolution instead of letting macOS upscale a 1x drawable.
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+#if QT_VERSION >= 0x050100 && QT_VERSION < 0x060000
+    // Pick @2x pixmaps from QIcon when available.
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
+
     QApplication app(argc, argv);
 
     // Register meta types used for QMetaObject::invokeMethod
@@ -275,13 +286,18 @@ int main(int argc, char *argv[])
             threadGroup.interrupt_all();
             threadGroup.join_all();
             Shutdown();
+            // Shutdown() has flushed wallet.dat, the LevelDB chainstate, and
+            // peers.dat to disk. Skip C++ stack destructors (which would crash
+            // in ~BlazecoinGUI -> delete ui because child widgets disconnect
+            // from already-destroyed model objects) by exiting now.
+            _exit(0);
         }
         else
         {
             threadGroup.interrupt_all();
             threadGroup.join_all();
             Shutdown();
-            return 1;
+            _exit(1);
         }
     } catch (std::exception& e) {
         handleRunawayException(&e);
