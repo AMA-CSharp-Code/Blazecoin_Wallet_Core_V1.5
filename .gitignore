@@ -82,3 +82,11 @@ desktop.ini
 .lock
 .vscode/
 .idea/
+
+# ---- macOS build outputs ----
+Blazecoin-Qt.app/
+src/blazecoind
+src/test_blazecoin
+src/leveldb/libleveldb.a
+src/leveldb/libmemenv.a
+build/

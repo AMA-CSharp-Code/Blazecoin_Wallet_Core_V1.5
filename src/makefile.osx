@@ -6,24 +6,30 @@
 # Mac OS X makefile for bitcoin
 # Originally by Laszlo Hanyecz (solar@heliacal.net)
 
-CXX=llvm-g++
-DEPSDIR=/usr/local
-DB4DIR=/usr/local/opt/berkeley-db4
-OPENSSLDIR=/usr/local/opt/openssl
+CXX=clang++
+CC=clang
+HOMEBREW=/opt/homebrew
+DEPSDIR=$(HOMEBREW)
+BDBDIR=$(HOMEBREW)/opt/berkeley-db
+OPENSSLDIR=$(HOMEBREW)/opt/openssl@3
+BOOSTDIR=$(HOMEBREW)/opt/boost
+BDB_LIB_SUFFIX=-18.1
 
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
  -I"$(CURDIR)/obj" \
  -I"$(DEPSDIR)/include" \
- -I"$(DB4DIR)/include" \
+ -I"$(BOOSTDIR)/include" \
+ -I"$(BDBDIR)/include" \
  -I"$(OPENSSLDIR)/include"
 
 LIBPATHS= \
  -L"$(DEPSDIR)/lib" \
- -L"$(DB4DIR)/lib" \
+ -L"$(BOOSTDIR)/lib" \
+ -L"$(BDBDIR)/lib" \
  -L"$(OPENSSLDIR)/lib"
 
-USE_UPNP:=1
+USE_UPNP:=-
 USE_IPV6:=1
 
 LIBS= -dead_strip
@@ -33,27 +39,25 @@ TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
 ifdef STATIC
 # Build STATIC if you are redistributing the bitcoind binary
 TESTLIBS += \
- $(DEPSDIR)/lib/libboost_unit_test_framework-mt.a
+ $(BOOSTDIR)/lib/libboost_unit_test_framework.a
 LIBS += \
- $(DB4DIR)/lib/libdb_cxx-4.8.a \
- $(DEPSDIR)/lib/libboost_system-mt.a \
- $(DEPSDIR)/lib/libboost_filesystem-mt.a \
- $(DEPSDIR)/lib/libboost_program_options-mt.a \
- $(DEPSDIR)/lib/libboost_thread-mt.a \
- $(DEPSDIR)/lib/libboost_chrono-mt.a \
+ $(BDBDIR)/lib/libdb_cxx$(BDB_LIB_SUFFIX).a \
+ $(BOOSTDIR)/lib/libboost_filesystem.a \
+ $(BOOSTDIR)/lib/libboost_program_options.a \
+ $(BOOSTDIR)/lib/libboost_thread.a \
+ $(BOOSTDIR)/lib/libboost_chrono.a \
  $(OPENSSLDIR)/lib/libssl.a \
  $(OPENSSLDIR)/lib/libcrypto.a \
  -lz
 else
 TESTLIBS += \
- -lboost_unit_test_framework-mt
+ -lboost_unit_test_framework
 LIBS += \
- -ldb_cxx-4.8 \
- -lboost_system-mt \
- -lboost_filesystem-mt \
- -lboost_program_options-mt \
- -lboost_thread-mt \
- -lboost_chrono-mt \
+ -ldb_cxx$(BDB_LIB_SUFFIX) \
+ -lboost_filesystem \
+ -lboost_program_options \
+ -lboost_thread \
+ -lboost_chrono \
  -lssl \
  -lcrypto \
  -lz
@@ -63,19 +67,13 @@ endif
 DEFS=-DMAC_OSX -DMSG_NOSIGNAL=0 -DBOOST_SPIRIT_THREADSAFE
 
 ifdef RELEASE
-# Compile for maximum compatibility and smallest size.
-# This requires that dependencies are compiled
-# the same way.
-CFLAGS = -mmacosx-version-min=10.5 -arch i386 -O3
+CFLAGS = -arch arm64 -O3
 else
 DEBUGFLAGS = -g
 endif
 
-# osx 10.9 has changed the stdlib default to libc++. To prevent some link error, you may need to use libstdc++
-CFLAGS += -stdlib=libstdc++
-
-# ppc doesn't work because we don't support big-endian
-CFLAGS += -Wall -Wextra -Wformat -Wformat-security -Wno-unused-parameter \
+CFLAGS += -arch arm64 -std=c++14 -Wall -Wextra -Wformat -Wformat-security \
+    -Wno-unused-parameter -Wno-deprecated-declarations \
     $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 
 OBJS= \

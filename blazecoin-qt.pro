@@ -444,7 +444,7 @@ OTHER_FILES += README.md \
 
 # platform specific defaults, if not overridden on command line
 isEmpty(BOOST_LIB_SUFFIX) {
-    macx:BOOST_LIB_SUFFIX = -mt
+    # Modern Homebrew Boost on macOS has no -mt suffix
     win32-g++:BOOST_LIB_SUFFIX = -mgw48-mt-s-1_55
     # vcpkg + MSVC convention
     win32-msvc*:BOOST_LIB_SUFFIX = -vc145-mt-x64-1_90
