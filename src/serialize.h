@@ -149,6 +149,16 @@ inline unsigned int GetSerializeSize(bool a, int, int=0)                        
 template<typename Stream> inline void Serialize(Stream& s, bool a, int, int=0)    { char f=a; WRITEDATA(s, f); }
 template<typename Stream> inline void Unserialize(Stream& s, bool& a, int, int=0) { char f; READDATA(s, f); a=f; }
 
+// Forward declarations for CBigNum overloads (defined in bignum.h).
+// These must be visible at template-definition time inside this header so that
+// dependent name lookup in CDataStream::Serialize/GetSerializeSize finds them
+// when instantiated with T = CBigNum, instead of falling back to the bool overload
+// via the implicit `operator BIGNUM*()` -> pointer -> bool conversion chain.
+class CBigNum;
+inline unsigned int GetSerializeSize(const CBigNum& a, int nType, int nVersion);
+template<typename Stream> inline void Serialize(Stream& s, const CBigNum& a, int nType, int nVersion);
+template<typename Stream> inline void Unserialize(Stream& s, CBigNum& a, int nType, int nVersion);
+
 
 
 

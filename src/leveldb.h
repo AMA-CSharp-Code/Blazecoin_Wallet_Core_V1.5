@@ -5,6 +5,7 @@
 #define BLAZECOIN_LEVELDB_H
 
 #include "serialize.h"
+#include "bignum.h"
 
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>

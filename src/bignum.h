@@ -604,13 +604,13 @@ inline unsigned int GetSerializeSize(const CBigNum& a, int nType = 0, int nVersi
 }
 
 template<typename Stream>
-inline void Serialize(Stream& s, const CBigNum& a, int nType = 0, int nVersion = PROTOCOL_VERSION)
+inline void Serialize(Stream& s, const CBigNum& a, int nType, int nVersion)
 {
     a.Serialize(s, nType, nVersion);
 }
 
 template<typename Stream>
-inline void Unserialize(Stream& s, CBigNum& a, int nType = 0, int nVersion = PROTOCOL_VERSION)
+inline void Unserialize(Stream& s, CBigNum& a, int nType, int nVersion)
 {
     a.Unserialize(s, nType, nVersion);
 }
