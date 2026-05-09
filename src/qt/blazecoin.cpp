@@ -137,6 +137,24 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
+    // Theme system QMessageBox popups (warning/question/critical/information) to
+    // match the rest of the BlazeCoin GUI. Without this, on macOS the popups use
+    // the native gray dialog look, which clashes with the black/red/white theme
+    // used by AskPassphraseDialog and the other custom dialogs.
+    app.setStyleSheet(
+        "QMessageBox { background-color: rgb(0, 0, 0); }"
+        "QMessageBox QLabel { color: #FFFFFF; background-color: transparent; }"
+        "QMessageBox QPushButton {"
+        "    background-color: rgb(0, 0, 0);"
+        "    color: #FFFFFF;"
+        "    border: 1px solid #d80317;"
+        "    padding: 6px 14px;"
+        "    min-width: 72px;"
+        "}"
+        "QMessageBox QPushButton:hover { background-color: #d80317; }"
+        "QMessageBox QPushButton:default { background-color: #d80317; }"
+    );
+
     // Register meta types used for QMetaObject::invokeMethod
     qRegisterMetaType< bool* >();
 
