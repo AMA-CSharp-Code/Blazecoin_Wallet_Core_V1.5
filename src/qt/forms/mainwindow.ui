@@ -1054,7 +1054,7 @@ QLabel {
       <rect>
        <x>11</x>
        <y>11</y>
-       <width>143</width>
+       <width>165</width>
        <height>17</height>
       </rect>
      </property>
@@ -1067,15 +1067,15 @@ QLabel {
       <string>Synchronizing Network</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
     <widget class="QProgressBar" name="progressBar">
      <property name="geometry">
       <rect>
-       <x>161</x>
+       <x>185</x>
        <y>9</y>
-       <width>655</width>
+       <width>640</width>
        <height>21</height>
       </rect>
      </property>
