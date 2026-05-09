@@ -185,7 +185,7 @@ void OptionsDialog::on_resetButton_clicked()
     if(model)
     {
         // confirmation dialog
-        int btnRetVal = MessageBoxDialog::question(this, tr("Confirm options reset"),
+        int btnRetVal = MessageBoxDialog::question(this, tr("Confirm Options Reset"),
             tr("Some settings may require a client restart to take effect.") + "<br><br>" + tr("Do you want to proceed?"));
 
         if(btnRetVal == QMessageBox::Cancel)

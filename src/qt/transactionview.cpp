@@ -312,7 +312,7 @@ void TransactionView::exportClicked()
 
     if(!writer.write())
     {
-        MessageBoxDialog::critical(this, tr("Error exporting"), tr("Could not write to file %1.").arg(filename));
+        MessageBoxDialog::critical(this, tr("Error Exporting"), tr("Could not write to file %1.").arg(filename));
     }
 }
 

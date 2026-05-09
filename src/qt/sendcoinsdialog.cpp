@@ -105,7 +105,7 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     fNewRecipientAllowed = false;
 
-    int retval = MessageBoxDialog::question(this, tr("Confirm send coins"),
+    int retval = MessageBoxDialog::question(this, tr("Confirm Send Coins"),
                           tr("Are you sure you want to send %1?").arg(formatted.join(tr(" and "))));
 
     if(retval != QDialog::Accepted)

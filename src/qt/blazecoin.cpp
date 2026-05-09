@@ -108,8 +108,8 @@ static std::string Translate(const char* psz)
  */
 static void handleRunawayException(std::exception *e)
 {
-    PrintExceptionContinue(e, "Runaway exception");
-    MessageBoxDialog::critical(0, "Runaway exception", BlazecoinGUI::tr("A fatal error occurred. Blazecoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
+    PrintExceptionContinue(e, "Runaway Exception");
+    MessageBoxDialog::critical(0, "Runaway Exception", BlazecoinGUI::tr("A fatal error occurred. Blazecoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
     exit(1);
 }
 

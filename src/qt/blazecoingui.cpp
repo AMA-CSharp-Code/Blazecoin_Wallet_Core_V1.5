@@ -856,7 +856,7 @@ void BlazecoinGUI::askFee(qint64 nFeeRequired, bool *payFee)
         "which goes to the nodes that process your transaction and helps to support the network. "
         "Do you want to pay the fee?").arg(BlazecoinUnits::formatWithUnit(BlazecoinUnits::BLZ, nFeeRequired));
     int retval = MessageBoxDialog::question(
-          this, tr("Confirm transaction fee"), strMessage);
+          this, tr("Confirm Transaction Fee"), strMessage);
     *payFee = (retval == QDialog::Accepted);
 }
 

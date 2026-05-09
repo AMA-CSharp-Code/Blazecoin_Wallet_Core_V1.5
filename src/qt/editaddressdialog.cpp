@@ -32,8 +32,8 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
         ui->picAdd->setVisible(true);
         break;
     case NewSendingAddress:
-        ui->lbTitle->setText(tr("New sending address"));
-        setWindowTitle(tr("New sending address"));
+        ui->lbTitle->setText(tr("New Sending Address"));
+        setWindowTitle(tr("New Sending Address"));
         ui->picEdit->setVisible(false);
         ui->picAdd->setVisible(true);
         break;
@@ -46,8 +46,8 @@ EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
         ui->picAdd->setVisible(false);
         break;
     case EditSendingAddress:
-        ui->lbTitle->setText(tr("Edit sending address"));
-        setWindowTitle(tr("Edit sending address"));
+        ui->lbTitle->setText(tr("Edit Sending Address"));
+        setWindowTitle(tr("Edit Sending Address"));
         ui->picEdit->setVisible(true);
         ui->picAdd->setVisible(false);
         break;
