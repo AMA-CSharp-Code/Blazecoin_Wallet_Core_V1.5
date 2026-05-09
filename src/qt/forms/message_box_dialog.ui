@@ -27,13 +27,13 @@
   </property>
   <property name="styleSheet">
    <string notr="true">#MessageBoxDialog {
-	background-color: rgb(0, 82, 174);
+	background-color: rgb(0, 0, 0);
 }
 
 /* =========== CheckBox ==============*/
 QCheckBox {
     spacing: 5px;
-	color: #0052AE;
+	color: #FFFFFF;
 }
 
 QCheckBox::indicator {
@@ -76,7 +76,7 @@ QCheckBox::indicator:checked:pressed {
     <widget class="QFrame" name="frame">
      <property name="styleSheet">
       <string notr="true">#frame {
-	background-color: #D8DFE9;
+	background-color: rgba(0, 0, 0, 180);
     border-style:none;
 }</string>
      </property>
@@ -109,7 +109,7 @@ QCheckBox::indicator:checked:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">#wCaption {
-	background-color:  rgb(0, 82, 174);
+	background-color:  rgb(0, 0, 0);
 }</string>
         </property>
         <property name="is_header" stdset="0">
@@ -170,7 +170,7 @@ QCheckBox::indicator:checked:pressed {
            </property>
            <property name="styleSheet">
             <string notr="true">QLabel {
-	color: #E9D9D8;
+	color: #FFFFFF;
 }</string>
            </property>
            <property name="text">
@@ -270,7 +270,7 @@ QPushButton:hover {
           </property>
           <property name="styleSheet">
            <string notr="true">QLabel {
-	color: #0052AE;
+	color: #FFFFFF;
 }</string>
           </property>
           <property name="text">
@@ -362,7 +362,7 @@ QPushButton:hover {
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -372,11 +372,11 @@ QPushButton:hover {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #0099CC;
+	background-color: #d80317;
 }</string>
            </property>
            <property name="text">
@@ -444,7 +444,7 @@ QPushButton:pressed:flat {
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton {
-    background-color: #758EB3;
+    background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -454,11 +454,11 @@ QPushButton:pressed:flat {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #0099CC;
+	background-color: #d80317;
 }</string>
            </property>
            <property name="text">
@@ -495,7 +495,7 @@ QPushButton:pressed:flat {
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton {
-	background-color: #758EB3;
+	background-color: rgba(0, 0, 0, 200);
 	color: #FFFFFF;
 	border: 0px solid gray;
 	max-height: 20px;
@@ -505,11 +505,11 @@ QPushButton:pressed:flat {
 }
 
 QPushButton:hover {
-	background-color: #0099CC;
+	background-color: #d80317;
 }
 
 QPushButton:pressed:flat {
-	background-color: #0099CC;
+	background-color: #d80317;
 }</string>
            </property>
            <property name="text">

@@ -26,6 +26,13 @@ public:
 
     bool getCheckboxStatusChecked();
 
+    /* QMessageBox-compatible static helpers (always themed) */
+    static int information(QWidget *parent, const QString &title, const QString &text);
+    static int warning(QWidget *parent, const QString &title, const QString &text);
+    static int critical(QWidget *parent, const QString &title, const QString &text);
+    /* Returns QDialog::Accepted for Yes, QDialog::Rejected for No/Cancel */
+    static int question(QWidget *parent, const QString &title, const QString &text);
+
 protected:
     void changeEvent(QEvent *e);
 

@@ -17,6 +17,7 @@
 
 #ifdef USE_QRCODE
 #include "qrcodedialog.h"
+#include "message_box_dialog.h"
 #endif
 
 AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
@@ -343,8 +344,7 @@ void AddressBookPage::exportClicked()
 
     if(!writer.write())
     {
-        QMessageBox::critical(this, tr("Error exporting"), tr("Could not write to file %1.").arg(filename),
-                              QMessageBox::Abort, QMessageBox::Abort);
+        MessageBoxDialog::critical(this, tr("Error exporting"), tr("Could not write to file %1.").arg(filename));
     }
 }
 

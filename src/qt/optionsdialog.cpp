@@ -10,6 +10,7 @@
 #include <QIntValidator>
 #include <QLocale>
 #include <QMessageBox>
+#include "message_box_dialog.h"
 
 OptionsDialog::OptionsDialog(QWidget *parent) :
     QDialog(parent),
@@ -184,9 +185,8 @@ void OptionsDialog::on_resetButton_clicked()
     if(model)
     {
         // confirmation dialog
-        QMessageBox::StandardButton btnRetVal = QMessageBox::question(this, tr("Confirm options reset"),
-            tr("Some settings may require a client restart to take effect.") + "<br><br>" + tr("Do you want to proceed?"),
-            QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+        int btnRetVal = MessageBoxDialog::question(this, tr("Confirm options reset"),
+            tr("Some settings may require a client restart to take effect.") + "<br><br>" + tr("Do you want to proceed?"));
 
         if(btnRetVal == QMessageBox::Cancel)
             return;
@@ -227,7 +227,7 @@ void OptionsDialog::showRestartWarning_Proxy()
 {
     if(!fRestartWarningDisplayed_Proxy)
     {
-        QMessageBox::warning(this, tr("Warning"), tr("This setting will take effect after restarting Blazecoin."), QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Warning"), tr("This setting will take effect after restarting Blazecoin."));
         fRestartWarningDisplayed_Proxy = true;
     }
 }
@@ -236,7 +236,7 @@ void OptionsDialog::showRestartWarning_Lang()
 {
     if(!fRestartWarningDisplayed_Lang)
     {
-        QMessageBox::warning(this, tr("Warning"), tr("This setting will take effect after restarting Blazecoin."), QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Warning"), tr("This setting will take effect after restarting Blazecoin."));
         fRestartWarningDisplayed_Lang = true;
     }
 }

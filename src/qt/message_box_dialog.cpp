@@ -59,6 +59,30 @@ bool MessageBoxDialog::getCheckboxStatusChecked()
     return ui->cbDontShow->isChecked();
 }
 
+int MessageBoxDialog::information(QWidget *parent, const QString &title, const QString &text)
+{
+    MessageBoxDialog d(parent);
+    return d.showMessage(title, text, E_INFORMATION);
+}
+
+int MessageBoxDialog::warning(QWidget *parent, const QString &title, const QString &text)
+{
+    MessageBoxDialog d(parent);
+    return d.showMessage(title, text, E_RED_ALERT);
+}
+
+int MessageBoxDialog::critical(QWidget *parent, const QString &title, const QString &text)
+{
+    MessageBoxDialog d(parent);
+    return d.showMessage(title, text, E_RED_ALERT);
+}
+
+int MessageBoxDialog::question(QWidget *parent, const QString &title, const QString &text)
+{
+    MessageBoxDialog d(parent);
+    return d.showMessage(title, text, E_YES_NO);
+}
+
 void MessageBoxDialog::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);
