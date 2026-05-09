@@ -15,6 +15,7 @@
 #include <QLocale>
 #include <QTextDocument>
 #include <QScrollBar>
+#include "message_box_dialog.h"
 
 SendCoinsDialog::SendCoinsDialog(QWidget *parent) :
     QDialog(parent),
@@ -104,12 +105,10 @@ void SendCoinsDialog::on_sendButton_clicked()
 
     fNewRecipientAllowed = false;
 
-    QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm send coins"),
-                          tr("Are you sure you want to send %1?").arg(formatted.join(tr(" and "))),
-          QMessageBox::Yes|QMessageBox::Cancel,
-          QMessageBox::Cancel);
+    int retval = MessageBoxDialog::question(this, tr("Confirm send coins"),
+                          tr("Are you sure you want to send %1?").arg(formatted.join(tr(" and "))));
 
-    if(retval != QMessageBox::Yes)
+    if(retval != QDialog::Accepted)
     {
         fNewRecipientAllowed = true;
         return;
@@ -127,40 +126,33 @@ void SendCoinsDialog::on_sendButton_clicked()
     switch(sendstatus.status)
     {
     case WalletModel::InvalidAddress:
-        QMessageBox::warning(this, tr("Send Coins"),
-            tr("The recipient address is not valid, please recheck."),
-            QMessageBox::Ok, QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Send Coins"),
+            tr("The recipient address is not valid, please recheck."));
         break;
     case WalletModel::InvalidAmount:
-        QMessageBox::warning(this, tr("Send Coins"),
-            tr("The amount to pay must be larger than 0."),
-            QMessageBox::Ok, QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Send Coins"),
+            tr("The amount to pay must be larger than 0."));
         break;
     case WalletModel::AmountExceedsBalance:
-        QMessageBox::warning(this, tr("Send Coins"),
-            tr("The amount exceeds your balance."),
-            QMessageBox::Ok, QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Send Coins"),
+            tr("The amount exceeds your balance."));
         break;
     case WalletModel::AmountWithFeeExceedsBalance:
-        QMessageBox::warning(this, tr("Send Coins"),
+        MessageBoxDialog::warning(this, tr("Send Coins"),
             tr("The total exceeds your balance when the %1 transaction fee is included.").
-            arg(BlazecoinUnits::formatWithUnit(BlazecoinUnits::BLZ, sendstatus.fee)),
-            QMessageBox::Ok, QMessageBox::Ok);
+            arg(BlazecoinUnits::formatWithUnit(BlazecoinUnits::BLZ, sendstatus.fee)));
         break;
     case WalletModel::DuplicateAddress:
-        QMessageBox::warning(this, tr("Send Coins"),
-            tr("Duplicate address found, can only send to each address once per send operation."),
-            QMessageBox::Ok, QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Send Coins"),
+            tr("Duplicate address found, can only send to each address once per send operation."));
         break;
     case WalletModel::TransactionCreationFailed:
-        QMessageBox::warning(this, tr("Send Coins"),
-            tr("Error: Transaction creation failed!"),
-            QMessageBox::Ok, QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Send Coins"),
+            tr("Error: Transaction creation failed!"));
         break;
     case WalletModel::TransactionCommitFailed:
-        QMessageBox::warning(this, tr("Send Coins"),
-            tr("Error: The transaction was rejected. This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here."),
-            QMessageBox::Ok, QMessageBox::Ok);
+        MessageBoxDialog::warning(this, tr("Send Coins"),
+            tr("Error: The transaction was rejected. This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here."));
         break;
     case WalletModel::Aborted: // User aborted, nothing to do
         break;

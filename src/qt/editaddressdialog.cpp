@@ -9,6 +9,7 @@
 #include <QDataWidgetMapper>
 #include <QMessageBox>
 #include "dialog_move_handler.h"
+#include "message_box_dialog.h"
 
 EditAddressDialog::EditAddressDialog(Mode mode, QWidget *parent) :
     QDialog(parent),
@@ -121,24 +122,20 @@ void EditAddressDialog::accept()
             // No changes were made during edit operation. Just reject.
             break;
         case AddressTableModel::INVALID_ADDRESS:
-            QMessageBox::warning(this, windowTitle(),
-                tr("The entered address \"%1\" is not a valid Blazecoin address.").arg(ui->addressEdit->text()),
-                QMessageBox::Ok, QMessageBox::Ok);
+            MessageBoxDialog::warning(this, windowTitle(),
+                tr("The entered address \"%1\" is not a valid Blazecoin address.").arg(ui->addressEdit->text()));
             break;
         case AddressTableModel::DUPLICATE_ADDRESS:
-            QMessageBox::warning(this, windowTitle(),
-                tr("The entered address \"%1\" is already in the address book.").arg(ui->addressEdit->text()),
-                QMessageBox::Ok, QMessageBox::Ok);
+            MessageBoxDialog::warning(this, windowTitle(),
+                tr("The entered address \"%1\" is already in the address book.").arg(ui->addressEdit->text()));
             break;
         case AddressTableModel::WALLET_UNLOCK_FAILURE:
-            QMessageBox::critical(this, windowTitle(),
-                tr("Could not unlock wallet."),
-                QMessageBox::Ok, QMessageBox::Ok);
+            MessageBoxDialog::critical(this, windowTitle(),
+                tr("Could not unlock wallet."));
             break;
         case AddressTableModel::KEY_GENERATION_FAILURE:
-            QMessageBox::critical(this, windowTitle(),
-                tr("New key generation failed."),
-                QMessageBox::Ok, QMessageBox::Ok);
+            MessageBoxDialog::critical(this, windowTitle(),
+                tr("New key generation failed."));
             break;
 
         }

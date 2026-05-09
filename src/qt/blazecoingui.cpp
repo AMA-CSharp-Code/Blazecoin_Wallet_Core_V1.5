@@ -855,10 +855,9 @@ void BlazecoinGUI::askFee(qint64 nFeeRequired, bool *payFee)
     QString strMessage = tr("This transaction is over the size limit. You can still send it for a fee of %1, "
         "which goes to the nodes that process your transaction and helps to support the network. "
         "Do you want to pay the fee?").arg(BlazecoinUnits::formatWithUnit(BlazecoinUnits::BLZ, nFeeRequired));
-    QMessageBox::StandardButton retval = QMessageBox::question(
-          this, tr("Confirm transaction fee"), strMessage,
-          QMessageBox::Yes|QMessageBox::Cancel, QMessageBox::Yes);
-    *payFee = (retval == QMessageBox::Yes);
+    int retval = MessageBoxDialog::question(
+          this, tr("Confirm transaction fee"), strMessage);
+    *payFee = (retval == QDialog::Accepted);
 }
 
 //void BlazecoinGUI::incomingTransaction(const QString& date, int unit, qint64 amount, const QString& type, const QString& address)
@@ -1325,15 +1324,14 @@ void BlazecoinGUI::importWallet()
         return;
     }
 
-    QMessageBox::StandardButton confirm = QMessageBox::warning(this,
+    int confirm = MessageBoxDialog::warning(this,
         tr("Import Wallet"),
         tr("This will replace the current wallet.dat with:\n\n%1\n\n"
            "Your existing wallet.dat will be saved as wallet.dat.bak.<timestamp> "
            "in the data directory.\n\n"
            "The wallet will close now. The import is applied on next startup.\n\n"
-           "Continue?").arg(filename),
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-    if (confirm != QMessageBox::Yes)
+           "Continue?").arg(filename));
+    if (confirm != QDialog::Accepted)
         return;
 
     // Write the marker into the data dir so init.cpp can find it on next start.
