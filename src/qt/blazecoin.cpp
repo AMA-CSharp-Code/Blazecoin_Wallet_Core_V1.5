@@ -155,6 +155,22 @@ int main(int argc, char *argv[])
     app.setStyleSheet(
         "QMessageBox { background-color: rgb(0, 0, 0); }"
         "QMessageBox QLabel { color: #FFFFFF; background-color: transparent; }"
+        // QMessageBox::question/warning/critical/information renders Qt's
+        // standard system icons (a black '?', a yellow warning triangle,
+        // etc.). With the dialog background forced black above, those
+        // glyphs end up black-on-black (most visible on the Send Coins
+        // 'Are you sure?' confirmation). The icon lives in an internal
+        // QLabel named 'qt_msgboxex_icon_label'; give just that label a
+        // white circular surface so the standard glyphs read correctly
+        // against our dark theme.
+        "QMessageBox QLabel#qt_msgboxex_icon_label {"
+        "    background-color: #FFFFFF;"
+        "    border-radius: 24px;"
+        "    min-width: 48px;"
+        "    min-height: 48px;"
+        "    padding: 4px;"
+        "    margin: 10px 6px 10px 10px;"
+        "}"
         "QMessageBox QPushButton {"
         "    background-color: rgb(0, 0, 0);"
         "    color: #FFFFFF;"
