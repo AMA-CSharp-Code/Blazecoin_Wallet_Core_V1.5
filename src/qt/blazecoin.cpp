@@ -167,6 +167,18 @@ int main(int argc, char *argv[])
         "QLineEdit, QAbstractSpinBox, QComboBox, QPlainTextEdit, QTextEdit {"
         "    color: #1c1c1c;"
         "}"
+        // Spin boxes (e.g. the Amount field in Send Coins, a QDoubleSpinBox
+        // inside BlazecoinAmountField) don't get a background from any of the
+        // per-form .ui stylesheets — only QLineEdit and QComboBox do. Without
+        // an explicit background here the spinbox falls back to whatever the
+        // surrounding dark theme gives it, so the (now-dark) text becomes
+        // unreadable on a dark surface. Force a white background to match the
+        // other input widgets.
+        "QAbstractSpinBox {"
+        "    background-color: white;"
+        "    border: 1px solid #ededed;"
+        "    min-height: 20px;"
+        "}"
     );
 
     // Register meta types used for QMetaObject::invokeMethod
