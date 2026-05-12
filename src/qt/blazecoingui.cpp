@@ -132,6 +132,18 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
     dotAnim->setLoopCount(-1);
     dotAnim->start();
 
+    // Blink the blaze icon in the bottom-right status bar (label_blaze) on a
+    // 1-second cadence while the chain is syncing. setNumBlocks() stops this
+    // timer and forces the label visible once the wallet is caught up to
+    // the network tip.
+    blazeIconBlinkTimer = new QTimer(this);
+    blazeIconBlinkTimer->setInterval(1000);
+    connect(blazeIconBlinkTimer, &QTimer::timeout, this, [this]() {
+        if (ui->label_blaze)
+            ui->label_blaze->setVisible(!ui->label_blaze->isVisible());
+    });
+    blazeIconBlinkTimer->start();
+
 #ifndef Q_OS_MAC
     if (!fIsTestnet)
     {
@@ -724,26 +736,21 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
         text = tr("%n day(s) ago","",secs/(60*60*24));
     }
 
-    // Set icon state: spinning if catching up, tick otherwise
+    // Set icon state: blink while catching up, solid when fully synced
     if(secs < 90*60 && count >= nTotalBlocks)
     {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
-        //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_4.png"));
-		labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+        if (blazeIconBlinkTimer && blazeIconBlinkTimer->isActive())
+            blazeIconBlinkTimer->stop();
+        labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+        labelBlazeIcon->setVisible(true);
         overviewPage->showOutOfSyncWarning(false);
     }
     else
     {
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
-        // labelBlocksIcon->setMovie(syncIconMovie);
-        //if (count < nTotalBlocks / 3)
-        //    labelBlocksIcon->setPixmap(QPixmap(":/res/sync_1.png"));
-        //else if (count < 2 * nTotalBlocks / 3)
-        //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_2.png"));
-        //else
-        //    labelBlocksIcon->setPixmap(QPixmap(":/res/sync_3.png"));
-        // syncIconMovie->start();
-
+        if (blazeIconBlinkTimer && !blazeIconBlinkTimer->isActive())
+            blazeIconBlinkTimer->start();
         overviewPage->showOutOfSyncWarning(true);
     }
 

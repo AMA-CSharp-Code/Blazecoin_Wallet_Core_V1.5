@@ -106,6 +106,11 @@ private:
     QLabel *progressBarLabel;
     QProgressBar *progressBar;
 
+    // Drives the blink-while-syncing / solid-when-synced behaviour on
+    // labelBlazeIcon. Started in the constructor, stopped from setNumBlocks
+    // when the chain catches up to the network tip.
+    QTimer *blazeIconBlinkTimer;
+
     QMenuBar *appMenuBar;
     QAction *overviewAction;
     QAction *historyAction;
