@@ -176,6 +176,11 @@ int main(int argc, char *argv[])
         "    max-height: 48px;"
         "    padding: 0;"
         "    margin: 14px;"
+        // QMessageBox's iconLabel inherits QLabel's default alignment
+        // (AlignLeft | AlignVCenter), so the 32px system glyph hugs the
+        // left edge of the 48x48 white circle. Force AlignCenter so the
+        // glyph sits dead-center inside the surface.
+        "    qproperty-alignment: AlignCenter;"
         "}"
         "QMessageBox QPushButton {"
         "    background-color: rgb(0, 0, 0);"
