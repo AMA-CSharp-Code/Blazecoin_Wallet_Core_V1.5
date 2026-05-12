@@ -166,10 +166,16 @@ int main(int argc, char *argv[])
         "QMessageBox QLabel#qt_msgboxex_icon_label {"
         "    background-color: #FFFFFF;"
         "    border-radius: 24px;"
+        // Lock to a fixed 48x48 square so the label can't stretch when
+        // the dialog has more text; otherwise Qt expands the label and
+        // the border-radius circle becomes a tall ellipse with the
+        // standard glyph sitting off-center inside it.
         "    min-width: 48px;"
+        "    max-width: 48px;"
         "    min-height: 48px;"
-        "    padding: 4px;"
-        "    margin: 10px 6px 10px 10px;"
+        "    max-height: 48px;"
+        "    padding: 0;"
+        "    margin: 14px;"
         "}"
         "QMessageBox QPushButton {"
         "    background-color: rgb(0, 0, 0);"
