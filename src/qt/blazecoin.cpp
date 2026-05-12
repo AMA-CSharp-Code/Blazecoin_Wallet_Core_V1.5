@@ -176,6 +176,31 @@ int main(int argc, char *argv[])
         "QAbstractSpinBox, QLineEdit, QComboBox {"
         "    min-height: 20px;"
         "}"
+        // When Qt's stylesheet engine styles QAbstractSpinBox at all (which
+        // we do above to set bg/text/border), it stops drawing the native
+        // up/down arrow buttons. Without explicit ::up-button / ::down-button
+        // / ::up-arrow / ::down-arrow rules the buttons are still hit-testable
+        // but invisible — most reported in the Send Coins Amount field.
+        // Re-render them: thin buttons on the right edge, dark-gray triangle
+        // image idle, BlazeCoin-red bg with white triangle on hover.
+        "QAbstractSpinBox {"
+        "    padding-right: 18px;"
+        "}"
+        "QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {"
+        "    subcontrol-origin: border;"
+        "    width: 16px;"
+        "    background-color: transparent;"
+        "    border-left: 1px solid #ededed;"
+        "}"
+        "QAbstractSpinBox::up-button { subcontrol-position: top right; }"
+        "QAbstractSpinBox::down-button { subcontrol-position: bottom right; }"
+        "QAbstractSpinBox::up-button:hover, QAbstractSpinBox::down-button:hover {"
+        "    background-color: #d80317;"
+        "}"
+        "QAbstractSpinBox::up-arrow   { image: url(:/res/spinbox_up.png);   width: 16px; height: 16px; }"
+        "QAbstractSpinBox::down-arrow { image: url(:/res/spinbox_down.png); width: 16px; height: 16px; }"
+        "QAbstractSpinBox::up-arrow:hover   { image: url(:/res/spinbox_up_hover.png); }"
+        "QAbstractSpinBox::down-arrow:hover { image: url(:/res/spinbox_down_hover.png); }"
         // The QComboBox popup (the list that appears when you click the box)
         // is a separate top-level QAbstractItemView widget that Qt spawns
         // on demand. It is not a regular child of the QComboBox in the

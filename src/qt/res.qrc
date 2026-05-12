@@ -139,5 +139,9 @@
         <file>res/connection_3.png</file>
         <file>res/connection_4.png</file>
         <file>res/connection_5.png</file>
+        <file>res/spinbox_up.png</file>
+        <file>res/spinbox_down.png</file>
+        <file>res/spinbox_up_hover.png</file>
+        <file>res/spinbox_down_hover.png</file>
     </qresource>
 </RCC>
