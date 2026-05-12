@@ -6,7 +6,7 @@ Status:
 - ☑ **Deployed (self-contained):** `macdeployqt` + transitive Boost deps + ad-hoc codesign. Bundle no longer needs Homebrew on the target Mac.
 - ☑ **Universal (arm64 + x86_64) GUI complete.** All 58 Mach-O files in the bundle are fat binaries. Both slices verified to launch on the build host (arm64 native, x86_64 via Rosetta). Bundle is 112 MB.
 - ☑ **Polish fixes landed:** HiDPI Retina rendering, Retina-aware `.icns`, and the long-standing `~BlazecoinGUI` shutdown crash on quit.
-- ☑ Installed to `/Applications/Blazecoin-Qt.app`.
+- ☑ Installed to `/Applications/Blazecoin V1.5.app` (qmake builds `Blazecoin-Qt.app`; renamed post-deploy so Finder/Dock show "Blazecoin V1.5").
 - ☐ Lipo-merge `blazecoind` arm64 + x86_64 into a universal CLI binary if you plan to ship the daemon alongside the GUI.
 - ☐ End-to-end test on a clean Mac (no Homebrew) — both Apple Silicon and Intel.
 - ☐ GitHub release (zip + SHA-256 + release notes with first-run instructions).
@@ -156,12 +156,21 @@ The daemon's source patches (filesystem qualifiers, CBigNum forward declarations
 
 ### Install to /Applications/
 
+qmake produces `Blazecoin-Qt.app`. Rename to `Blazecoin V1.5.app` before
+installing so Finder, the Dock and the Cmd-Tab switcher show the proper
+product name. The binary inside stays `Contents/MacOS/Blazecoin-Qt`
+(unchanged `CFBundleExecutable`), and `Info.plist`'s `CFBundleName` /
+`CFBundleDisplayName` already say "Blazecoin V1.5", so every label is
+consistent.
+
 ```bash
-cp -R Blazecoin-Qt.app /Applications/
-open /Applications/Blazecoin-Qt.app
+cp -R Blazecoin-Qt.app "/Applications/Blazecoin V1.5.app"
+codesign --force --deep --sign - --timestamp=none "/Applications/Blazecoin V1.5.app"
+open "/Applications/Blazecoin V1.5.app"
 ```
 
-Or just drag the `.app` from a Finder window into `/Applications/`.
+Or just drag the `.app` from a Finder window into `/Applications/` and
+rename it there.
 
 The app uses the same data dir as the daemon: `~/Library/Application Support/BlazecoinV1.5/`. If the daemon already populated it, the GUI starts with that block height instead of from genesis.
 
@@ -373,17 +382,35 @@ arch -x86_64 Blazecoin-Qt-universal/Blazecoin-Qt.app/Contents/MacOS/Blazecoin-Qt
 
 Once the universal bundle is verified, packaging for download:
 
-### 1. Compress the .app
+### 1. Rename the .app for the user-visible label
+
+qmake builds the bundle as `Blazecoin-Qt.app` (TARGET in the .pro). macOS
+shows the .app's filename (minus `.app`) under the icon in Finder and the
+Dock. To display "Blazecoin V1.5" everywhere, rename the bundle before
+zipping or installing:
+
+```bash
+mv Blazecoin-Qt.app "Blazecoin V1.5.app"
+# Re-sign because the rename can invalidate the existing signature
+codesign --force --deep --sign - --timestamp=none "Blazecoin V1.5.app"
+```
+
+The binary inside stays `Contents/MacOS/Blazecoin-Qt` and
+`CFBundleExecutable` keeps pointing at it. Only the bundle filename
+changes. The Info.plist `CFBundleName` / `CFBundleDisplayName` (already
+"Blazecoin V1.5") cover the Dock, menu bar, Spotlight and Cmd-Tab.
+
+### 2. Compress the .app
 
 ```bash
 # Zip preserves bundle structure and is what Gatekeeper expects
 cd /Applications
-zip -ry Blazecoin-Qt-v1.5.0-macOS-universal.zip Blazecoin-Qt.app
+zip -ry Blazecoin-V1.5-macOS-universal.zip "Blazecoin V1.5.app"
 ```
 
 A DMG is also fine (`hdiutil create`) but adds no real value over a zip for download distribution.
 
-### 2. First-run instructions for users (include in release notes)
+### 3. First-run instructions for users (include in release notes)
 
 Because the build is ad-hoc signed, Gatekeeper will block first launch. Users need:
 
@@ -401,7 +428,7 @@ Because the build is ad-hoc signed, Gatekeeper will block first launch. Users ne
 >
 > This removes the quarantine flag set during download. Then double-click to launch.
 
-### 3. Pre-release validation (run on the build host)
+### 4. Pre-release validation (run on the build host)
 
 Quick checks the universal bundle is sound before zipping:
 
@@ -440,7 +467,7 @@ tail -3 "$HOME/Library/Application Support/BlazecoinV1.5/debug.log"
 # expect: ... wallet.dat closed / DBFlush(true) ended / Shutdown : done
 ```
 
-### 4. Release checklist
+### 5. Release checklist
 
 - ☐ Bump version in [src/clientversion.h](src/clientversion.h) and [blazecoin-qt.pro](blazecoin-qt.pro) (currently `0.8.6.2` in the .pro, `1050000` reported by `getinfo`).
 - ☐ Tag the commit (`git tag -a v1.5.0-macos.1 -m "..."`).
