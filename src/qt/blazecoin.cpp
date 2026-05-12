@@ -176,6 +176,22 @@ int main(int argc, char *argv[])
         "QAbstractSpinBox, QLineEdit, QComboBox {"
         "    min-height: 20px;"
         "}"
+        // The QComboBox popup (the list that appears when you click the box)
+        // is a separate top-level QAbstractItemView widget that Qt spawns
+        // on demand. It is not a regular child of the QComboBox in the
+        // widget tree, so the rules above don't reach it; without an
+        // explicit rule the popup inherits the surrounding dark theme and
+        // becomes a black list on a black surface (most visible on the
+        // Send Coins amount-unit combo and the Transactions date/type
+        // filters). The descendant selector below targets that popup view.
+        "QComboBox QAbstractItemView {"
+        "    background-color: white;"
+        "    color: #1c1c1c;"
+        "    border: 1px solid #ededed;"
+        "    selection-background-color: #d80317;"
+        "    selection-color: #FFFFFF;"
+        "    outline: 0;"
+        "}"
         // Some per-form stylesheets set a more specific :editable / :!editable
         // background; those keep winning by selector specificity. The audit
         // across all .ui forms found no inputs with intentional dark
