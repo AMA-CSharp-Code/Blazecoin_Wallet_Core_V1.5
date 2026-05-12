@@ -137,10 +137,21 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    // Theme system QMessageBox popups (warning/question/critical/information) to
-    // match the rest of the BlazeCoin GUI. Without this, on macOS the popups use
-    // the native gray dialog look, which clashes with the black/red/white theme
-    // used by AskPassphraseDialog and the other custom dialogs.
+    // Application-wide stylesheet overrides.
+    //
+    // 1. Theme system QMessageBox popups (warning/question/critical/information)
+    //    to match the rest of the BlazeCoin GUI. Without this, on macOS the
+    //    popups use the native gray dialog look, which clashes with the
+    //    black/red/white theme used by AskPassphraseDialog and the other
+    //    custom dialogs.
+    //
+    // 2. Force dark text on data-entry widgets. The per-form stylesheets in
+    //    the .ui files give inputs (QLineEdit / QComboBox / amount spinbox)
+    //    a white background but no explicit color, so the text inherits the
+    //    surrounding dark-theme white color and becomes invisible (most
+    //    visibly in the Send Coins form). Setting the color globally on the
+    //    input widget classes fixes every form at once without having to
+    //    touch each .ui individually.
     app.setStyleSheet(
         "QMessageBox { background-color: rgb(0, 0, 0); }"
         "QMessageBox QLabel { color: #FFFFFF; background-color: transparent; }"
@@ -153,6 +164,9 @@ int main(int argc, char *argv[])
         "}"
         "QMessageBox QPushButton:hover { background-color: #d80317; }"
         "QMessageBox QPushButton:default { background-color: #d80317; }"
+        "QLineEdit, QAbstractSpinBox, QComboBox, QPlainTextEdit, QTextEdit {"
+        "    color: #1c1c1c;"
+        "}"
     );
 
     // Register meta types used for QMetaObject::invokeMethod
