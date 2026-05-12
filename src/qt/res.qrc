@@ -143,5 +143,6 @@
         <file>res/spinbox_down.png</file>
         <file>res/spinbox_up_hover.png</file>
         <file>res/spinbox_down_hover.png</file>
+        <file>res/msgbox_question_white.png</file>
     </qresource>
 </RCC>

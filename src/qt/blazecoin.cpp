@@ -4,9 +4,27 @@
  */
 
 #include <QApplication>
+#include <QProxyStyle>
+#include <QIcon>
 #include <unistd.h>  // _exit
 
 #include "blazecoingui.h"
+
+// Replaces the platform-default QMessageBox::Question icon (a black "?"
+// glyph that renders invisibly on the black BlazeCoin-themed dialog) with
+// a custom white "?" pixmap. Other QMessageBox icons (Warning/Critical/
+// Information) keep their default coloured glyphs, which are readable on
+// the dark surface.
+class BlazecoinProxyStyle : public QProxyStyle {
+public:
+    using QProxyStyle::QProxyStyle;
+    QIcon standardIcon(StandardPixmap sp, const QStyleOption *opt,
+                       const QWidget *w) const override {
+        if (sp == QStyle::SP_MessageBoxQuestion)
+            return QIcon(":/res/msgbox_question_white.png");
+        return QProxyStyle::standardIcon(sp, opt, w);
+    }
+};
 #include "clientmodel.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
@@ -137,6 +155,10 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
+    // Install the proxy style before any widgets are created, so the
+    // QMessageBox::Question icon override is in effect from first use.
+    app.setStyle(new BlazecoinProxyStyle);
+
     // Application-wide stylesheet overrides.
     //
     // 1. Theme system QMessageBox popups (warning/question/critical/information)
@@ -155,33 +177,12 @@ int main(int argc, char *argv[])
     app.setStyleSheet(
         "QMessageBox { background-color: rgb(0, 0, 0); }"
         "QMessageBox QLabel { color: #FFFFFF; background-color: transparent; }"
-        // QMessageBox::question/warning/critical/information renders Qt's
-        // standard system icons (a black '?', a yellow warning triangle,
-        // etc.). With the dialog background forced black above, those
-        // glyphs end up black-on-black (most visible on the Send Coins
-        // 'Are you sure?' confirmation). The icon lives in an internal
-        // QLabel named 'qt_msgboxex_icon_label'; give just that label a
-        // white circular surface so the standard glyphs read correctly
-        // against our dark theme.
-        "QMessageBox QLabel#qt_msgboxex_icon_label {"
-        "    background-color: #FFFFFF;"
-        "    border-radius: 24px;"
-        // Lock to a fixed 48x48 square so the label can't stretch when
-        // the dialog has more text; otherwise Qt expands the label and
-        // the border-radius circle becomes a tall ellipse with the
-        // standard glyph sitting off-center inside it.
-        "    min-width: 48px;"
-        "    max-width: 48px;"
-        "    min-height: 48px;"
-        "    max-height: 48px;"
-        "    padding: 0;"
-        "    margin: 14px;"
-        // QMessageBox's iconLabel inherits QLabel's default alignment
-        // (AlignLeft | AlignVCenter), so the 32px system glyph hugs the
-        // left edge of the 48x48 white circle. Force AlignCenter so the
-        // glyph sits dead-center inside the surface.
-        "    qproperty-alignment: AlignCenter;"
-        "}"
+        // The QMessageBox::Question icon (black "?") would be invisible
+        // against the black dialog background, so BlazecoinProxyStyle
+        // returns a custom white "?" pixmap for SP_MessageBoxQuestion
+        // instead. Warning/Critical/Information dialogs keep their
+        // platform-default coloured glyphs (yellow !, red stop, blue i)
+        // which are readable against the dark surface.
         "QMessageBox QPushButton {"
         "    background-color: rgb(0, 0, 0);"
         "    color: #FFFFFF;"
