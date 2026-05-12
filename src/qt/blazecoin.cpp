@@ -166,19 +166,20 @@ int main(int argc, char *argv[])
         "QMessageBox QPushButton:default { background-color: #d80317; }"
         "QLineEdit, QAbstractSpinBox, QComboBox, QPlainTextEdit, QTextEdit {"
         "    color: #1c1c1c;"
-        "}"
-        // Spin boxes (e.g. the Amount field in Send Coins, a QDoubleSpinBox
-        // inside BlazecoinAmountField) don't get a background from any of the
-        // per-form .ui stylesheets — only QLineEdit and QComboBox do. Without
-        // an explicit background here the spinbox falls back to whatever the
-        // surrounding dark theme gives it, so the (now-dark) text becomes
-        // unreadable on a dark surface. Force a white background to match the
-        // other input widgets.
-        "QAbstractSpinBox {"
         "    background-color: white;"
         "    border: 1px solid #ededed;"
+        "}"
+        // Spin boxes (e.g. the Amount field in Send Coins, a QDoubleSpinBox
+        // inside BlazecoinAmountField) and the date pickers on the
+        // Transactions page (QDateTimeEdit) inherit from QAbstractSpinBox;
+        // the explicit min-height keeps them aligned with the other inputs.
+        "QAbstractSpinBox, QLineEdit, QComboBox {"
         "    min-height: 20px;"
         "}"
+        // Some per-form stylesheets set a more specific :editable / :!editable
+        // background; those keep winning by selector specificity. The audit
+        // across all .ui forms found no inputs with intentional dark
+        // backgrounds, so a white default is safe app-wide.
     );
 
     // Register meta types used for QMetaObject::invokeMethod
