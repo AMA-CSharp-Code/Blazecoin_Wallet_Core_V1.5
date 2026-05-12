@@ -132,6 +132,30 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
     dotAnim->setLoopCount(-1);
     dotAnim->start();
 
+    // Sync-status indicator in the bottom-right of the wallet
+    // (ui->label_blaze, exposed as labelBlazeIcon below). Render it as a
+    // styled circle (BlazeCoin red) instead of the bundled blaze_icon_*
+    // PNGs so we can drive its appearance from code: pulse opacity while
+    // catching up to the network, hold solid when fully synced. setNumBlocks()
+    // calls blazeIconAnim->start()/stop() as the sync state changes.
+    ui->label_blaze->setPixmap(QPixmap());
+    ui->label_blaze->setStyleSheet(
+        "background-color: #d80317;"
+        "border-radius: 8px;"
+        "border: 1px solid #68030c;"
+    );
+    ui->label_blaze->setFixedSize(16, 16);
+    blazeIconOpacity = new QGraphicsOpacityEffect(ui->label_blaze);
+    blazeIconOpacity->setOpacity(1.0);
+    ui->label_blaze->setGraphicsEffect(blazeIconOpacity);
+    blazeIconAnim = new QPropertyAnimation(blazeIconOpacity, "opacity", this);
+    blazeIconAnim->setDuration(1400);
+    blazeIconAnim->setStartValue(0.25);
+    blazeIconAnim->setKeyValueAt(0.5, 1.0);
+    blazeIconAnim->setEndValue(0.25);
+    blazeIconAnim->setLoopCount(-1);
+    blazeIconAnim->start();
+
 #ifndef Q_OS_MAC
     if (!fIsTestnet)
     {
@@ -724,26 +748,21 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
         text = tr("%n day(s) ago","",secs/(60*60*24));
     }
 
-    // Set icon state: spinning if catching up, tick otherwise
+    // Set icon state: solid red dot when up to date, pulsing red while catching up
     if(secs < 90*60 && count >= nTotalBlocks)
     {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
-        //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_4.png"));
-		labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+        if (blazeIconAnim && blazeIconAnim->state() == QAbstractAnimation::Running)
+            blazeIconAnim->stop();
+        if (blazeIconOpacity)
+            blazeIconOpacity->setOpacity(1.0);
         overviewPage->showOutOfSyncWarning(false);
     }
     else
     {
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
-        // labelBlocksIcon->setMovie(syncIconMovie);
-        //if (count < nTotalBlocks / 3)
-        //    labelBlocksIcon->setPixmap(QPixmap(":/res/sync_1.png"));
-        //else if (count < 2 * nTotalBlocks / 3)
-        //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_2.png"));
-        //else
-        //    labelBlocksIcon->setPixmap(QPixmap(":/res/sync_3.png"));
-        // syncIconMovie->start();
-
+        if (blazeIconAnim && blazeIconAnim->state() != QAbstractAnimation::Running)
+            blazeIconAnim->start();
         overviewPage->showOutOfSyncWarning(true);
     }
 

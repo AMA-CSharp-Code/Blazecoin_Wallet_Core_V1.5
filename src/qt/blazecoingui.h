@@ -106,6 +106,12 @@ private:
     QLabel *progressBarLabel;
     QProgressBar *progressBar;
 
+    // Status indicator (bottom-right of the wallet): pulses while the
+    // blockchain is syncing, solid red when fully caught up. Members so
+    // setNumBlocks() can start/stop the animation as the sync state moves.
+    class QGraphicsOpacityEffect *blazeIconOpacity;
+    class QPropertyAnimation     *blazeIconAnim;
+
     QMenuBar *appMenuBar;
     QAction *overviewAction;
     QAction *historyAction;
