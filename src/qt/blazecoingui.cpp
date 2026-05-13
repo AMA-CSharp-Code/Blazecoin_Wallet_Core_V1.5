@@ -263,6 +263,21 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
 
     syncIconMovie = new QMovie(":/movies/update_spinner", "mng", this);
 
+    {
+        QPixmap base(":/res/blaze_icon_off.png");
+        blazeIconRed = QPixmap(base.size());
+        blazeIconRed.fill(Qt::transparent);
+        QPainter p(&blazeIconRed);
+        p.drawPixmap(0, 0, base);
+        p.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        p.fillRect(blazeIconRed.rect(), QColor(0xd8, 0x03, 0x17));
+    }
+
+    syncBlinkTimer = new QTimer(this);
+    syncBlinkTimer->setInterval(1000);
+    syncBlinkOn = true;
+    connect(syncBlinkTimer, SIGNAL(timeout()), this, SLOT(syncBlinkTick()));
+
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
@@ -729,12 +744,19 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
     {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_4.png"));
-		labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+        if (syncBlinkTimer->isActive())
+            syncBlinkTimer->stop();
+        labelBlazeIcon->setPixmap(blazeIconRed);
         overviewPage->showOutOfSyncWarning(false);
     }
     else
     {
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
+        if (!syncBlinkTimer->isActive()) {
+            syncBlinkOn = true;
+            labelBlazeIcon->setPixmap(blazeIconRed);
+            syncBlinkTimer->start();
+        }
         // labelBlocksIcon->setMovie(syncIconMovie);
         //if (count < nTotalBlocks / 3)
         //    labelBlocksIcon->setPixmap(QPixmap(":/res/sync_1.png"));
@@ -1416,4 +1438,13 @@ void BlazecoinGUI::onMiningClicked()
 void BlazecoinGUI::on_bHelp_clicked()
 {
     rpcConsole->show();
+}
+
+void BlazecoinGUI::syncBlinkTick()
+{
+    syncBlinkOn = !syncBlinkOn;
+    if (syncBlinkOn)
+        labelBlazeIcon->setPixmap(blazeIconRed);
+    else
+        labelBlazeIcon->setPixmap(QPixmap());
 }

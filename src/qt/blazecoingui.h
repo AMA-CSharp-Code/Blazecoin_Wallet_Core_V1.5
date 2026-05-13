@@ -33,6 +33,7 @@ class QUrl;
 class QListWidget;
 class QPushButton;
 class QAction;
+class QTimer;
 QT_END_NAMESPACE
 
 namespace Ui {
@@ -134,6 +135,10 @@ private:
     QMovie *syncIconMovie;
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
+
+    QTimer *syncBlinkTimer;
+    bool syncBlinkOn;
+    QPixmap blazeIconRed;
 
     /** Create the main UI actions. */
     void createActions(bool fIsTestnet);
@@ -241,6 +246,8 @@ private slots:
 
     void onMiningClicked();
     void on_bHelp_clicked();
+
+    void syncBlinkTick();
 };
 
 #endif // BLAZECOINGUI_H
