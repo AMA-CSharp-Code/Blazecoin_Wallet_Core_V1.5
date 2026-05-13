@@ -5,13 +5,45 @@ Status:
 - ☑ **Qt GUI (`Blazecoin-Qt.app`) builds and runs natively on arm64 + x86_64.**
 - ☑ **Deployed (self-contained):** `macdeployqt` + transitive Boost deps + ad-hoc codesign. Bundle no longer needs Homebrew on the target Mac.
 - ☑ **Universal (arm64 + x86_64) GUI complete.** All 58 Mach-O files in the bundle are fat binaries. Both slices verified to launch on the build host (arm64 native, x86_64 via Rosetta). Bundle is 112 MB.
-- ☑ **Polish fixes landed:** HiDPI Retina rendering, Retina-aware `.icns`, and the long-standing `~BlazecoinGUI` shutdown crash on quit.
+- ☑ **Build polish landed:** HiDPI Retina rendering, Retina-aware `.icns`, and the `~BlazecoinGUI` shutdown crash fix.
+- ☑ **UX / theming polish landed** (during real-world testing on this branch):
+  - In-app icon swapped from the gold coin to the red phoenix-in-circle from the header logo, centered on the canvas.
+  - App display name is "Blazecoin V1.5" everywhere (CFBundleName/CFBundleDisplayName + bundle rename).
+  - QMessageBox dialogs themed black/red/white to match the GUI; question dialogs use a custom white "?" via a `QProxyStyle` override.
+  - Data-entry widgets (`QLineEdit`, `QComboBox`, `QAbstractSpinBox`, `QTextEdit`) globally given a white background + dark `#1c1c1c` text; combobox popups themed; spinbox up/down buttons get explicit arrow PNGs.
+  - Bottom-right status indicator (`label_blaze`) blinks every 1s while syncing, holds solid red when caught up; `blaze_icon_on.png` re-coloured to BlazeCoin red while preserving the original meridian alpha.
 - ☑ Installed to `/Applications/Blazecoin V1.5.app` (qmake builds `Blazecoin-Qt.app`; renamed post-deploy so Finder/Dock show "Blazecoin V1.5").
+- ◐ **Real-world testing in progress** — chain sync + Send/Receive flows are being exercised on the build host. No data-integrity issues found; remaining feedback has been cosmetic and is captured in the commits above.
 - ☐ Lipo-merge `blazecoind` arm64 + x86_64 into a universal CLI binary if you plan to ship the daemon alongside the GUI.
 - ☐ End-to-end test on a clean Mac (no Homebrew) — both Apple Silicon and Intel.
 - ☐ GitHub release (zip + SHA-256 + release notes with first-run instructions).
 
 The repo's existing build instructions (`START_HERE.md`, `MSYS2-Setup-QuickStart.md`, `VISUAL_STUDIO_BUILD_READY.md`) are Windows-only. This document captures the macOS port.
+
+---
+
+## Session checkpoint (2026-05-13)
+
+When picking this back up:
+
+**State on disk and on the branch:**
+- Branch: `macos-v1.5.0`, pushed and in sync with `origin/macos-v1.5.0`. Tip commit: `adaaf1d`.
+- Installed app: `/Applications/Blazecoin V1.5.app` — universal binary, ad-hoc signed, all the polish above applied.
+- Build trees: `~/blazecoin-investigation/Blazecoin_Wallet_Core_V1.5` (arm64) and `Blazecoin_Wallet_Core_V1.5_x64` (x86_64). Both clean against HEAD.
+- Wallet data: `~/Library/Application Support/BlazecoinV1.5/` — leave it as-is between sessions; it's just persistent chain + wallet state.
+
+**The remaining work, in order:**
+
+1. **Finish real-world testing.** Drive the chain to 100% sync, generate addresses, back up `wallet.dat`, do at least one receive + one send to exercise the full signing path. Continue noting any visual issues you spot during the runs; each round of fixes has been quick to apply.
+2. **(Optional) Lipo-merge `blazecoind` into a universal CLI** if you intend to ship the daemon alongside the GUI. Recipe under "Daemon build § Optional: lipo-merge the daemon into a universal CLI binary". Not needed if shipping GUI only.
+3. **Test on a clean Mac without Homebrew** (one Apple Silicon, one Intel if you have one). Use the Pre-release validation checklist under "GitHub release § 4. Pre-release validation".
+4. **Cut the GitHub release.** Zip + SHA-256 + release notes. Full recipe under "GitHub release". `gh` CLI is installed and authenticated; the only manual step is writing the release notes.
+5. **Notarization** if/when the project picks up an Apple Developer Program seat. Optional — ad-hoc signing + the right-click → Open story is fine for an initial release.
+
+**Things to *not* do on resume:**
+- Don't merge `macos-v1.5.0` into `dev` without re-confirming the two source areas the doc flags as "needs `_WIN32` guard" (`_exit(0)` shutdown fix) and "subtle but compatible" (CBigNum default-arg reshuffle). The branch is safe to ship from on its own; merging is a separate decision.
+- Don't force-push `macos-v1.5.0` — every commit has been pushed cleanly.
+- Don't `git rebase -i` the existing commits; if you want to amend the history, do it on a new branch.
 
 ---
 
@@ -636,6 +668,22 @@ GUI-only source patches:
   - added `Qt::AA_EnableHighDpiScaling` and `Qt::AA_UseHighDpiPixmaps` attributes before `QApplication` construction so widgets render at native Retina resolution
   - added `_exit(0)` immediately after `Shutdown()` (inside the try block — `window` is declared there) to skip the buggy `~BlazecoinGUI` destructor chain
   - added `#include <unistd.h>` for `_exit`
+  - added `BlazecoinProxyStyle : QProxyStyle` with `standardIcon()` override returning a custom white "?" for `SP_MessageBoxQuestion`; installed via `app.setStyle(...)` so it applies to every QMessageBox without per-call-site changes
+  - added a global stylesheet on `QApplication` that:
+    - themes `QMessageBox` black/red/white (`background-color`, label text colour, button border `#d80317`, hover bg, default button bg);
+    - gives `QLineEdit / QAbstractSpinBox / QComboBox / QPlainTextEdit / QTextEdit` a white background, `#1c1c1c` text, `1px #ededed` border, `min-height: 20px`;
+    - themes the `QComboBox QAbstractItemView` popup (white bg, dark text, BlazeCoin-red `selection-background-color`);
+    - renders explicit `QAbstractSpinBox::up-button` / `::down-button` with PNG arrows (because Qt stops drawing native arrow sub-controls once the spinbox class is stylesheet-styled);
+    - sets `padding-right: 18px` on `QAbstractSpinBox` so the value doesn't overlap the buttons
+- [src/qt/blazecoingui.cpp](src/qt/blazecoingui.cpp) / [.h](src/qt/blazecoingui.h):
+  - added `blazeIconBlinkTimer` (QTimer, 1000 ms interval) that toggles `ui->label_blaze->setVisible(...)` so the bottom-right status icon blinks while syncing
+  - `setNumBlocks()` stops the timer + forces the icon visible (with the `:/res/blaze_icon_on.png` pixmap) once `count >= nTotalBlocks` and the tip is recent
 
 Asset updates:
 - [src/qt/res/icons/blazecoin.icns](src/qt/res/icons/blazecoin.icns) — regenerated with `@2x` slices for Retina dock-icon rendering.
+- [src/qt/res/icons/blazecoin.png](src/qt/res/icons/blazecoin.png) — in-app icon replaced with the red phoenix-in-circle from the header logo (centered on a 1024 master, downscaled to 256×256 with Lanczos). Backup of the original gold coin lives alongside as `blazecoin.png.gold.bak` and `blazecoin.icns.gold.bak` (uncommitted, in case of revert).
+- [src/qt/res/blaze_icon_on.png](src/qt/res/blaze_icon_on.png) — recoloured from white to BlazeCoin red `#d80317` using `imagemagick -fill #d80317 -colorize 100` so the alpha mask (the meridian/globe shape) is preserved. The original white pixmap is preserved alongside as `blaze_icon_on.png.white.bak` (uncommitted).
+- [src/qt/res/spinbox_up.png](src/qt/res/spinbox_up.png) / [spinbox_down.png](src/qt/res/spinbox_down.png) / `_hover` variants — small 16×16 dark-grey triangles drawn with ImageMagick, used by the spinbox button stylesheet rules. Hover variants are white triangles on the BlazeCoin-red hover bg.
+- [src/qt/res/msgbox_question_white.png](src/qt/res/msgbox_question_white.png) — 64×64 white "?" on transparent canvas, returned by `BlazecoinProxyStyle` for `SP_MessageBoxQuestion`.
+- [src/qt/res.qrc](src/qt/res.qrc) — registers the new spinbox arrow PNGs and the white-? icon.
+- [share/qt/Info.plist](share/qt/Info.plist) — added `CFBundleName` / `CFBundleDisplayName` = "Blazecoin V1.5". `CFBundleExecutable` stays "Blazecoin-Qt" so the binary path on disk is unchanged.
