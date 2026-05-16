@@ -34,7 +34,7 @@ When picking this back up:
 
 **The remaining work, in order:**
 
-1. **Finish real-world testing.** Drive the chain to 100% sync, generate addresses, back up `wallet.dat`, do at least one receive + one send to exercise the full signing path. Continue noting any visual issues you spot during the runs; each round of fixes has been quick to apply.
+1. **Real-world testing — M1: PASSED (2026-05-13).** Chain synced, send and receive both confirmed working on Apple Silicon (transaction signing + broadcast + receipt through the OpenSSL 3 / BDB 18.1 paths). Intel Mac: launches/runs natively confirmed; full sync + send/receive on that machine still to be completed before release.
 
    **Intel Mac clean-room test (2026-05-13):** the universal zip (`Blazecoin-V1.5-macOS-universal.zip`, SHA-256 `588f60d0…`) was transferred to a second Mac running Intel hardware with no Homebrew / Qt / Boost installed. It launched and ran natively as the x86_64 slice (Intel Macs have no Rosetta, so this proves the self-contained bundle works for end users). Window, theme and sync all looked correct on first run. Still to finish there: drive it to full sync + do a send/receive.
 2. **(Optional) Lipo-merge `blazecoind` into a universal CLI** if you intend to ship the daemon alongside the GUI. Recipe under "Daemon build § Optional: lipo-merge the daemon into a universal CLI binary". Not needed if shipping GUI only.
