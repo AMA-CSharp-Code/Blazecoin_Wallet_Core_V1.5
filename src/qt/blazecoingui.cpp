@@ -224,6 +224,11 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
     frameBlocksLayout->setSpacing(3);
     labelEncryptionIcon = new QLabel();
 	labelBlazeIcon = ui->label_blaze;
+    // Force the red Blaze icon up front so the white blaze_icon_off.png the
+    // .ui sets as label_blaze's default is never shown: setNumBlocks() can
+    // early-return (0 connections / no block source) before it touches the
+    // icon, which otherwise leaves the Designer default (white) on screen.
+    labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
     // labelConnectionsIcon = new QLabel();
     labelConnectionsIcon = ui->label_14;
     // labelBlocksIcon = new QLabel();
@@ -777,10 +782,20 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
 void BlazecoinGUI::blinkBlazeIcon()
 {
     blazeBlinkOn = !blazeBlinkOn;
+    QPixmap red(":/res/blaze_icon_on.png");
     if (blazeBlinkOn)
-        labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+    {
+        labelBlazeIcon->setPixmap(red);
+    }
     else
-        labelBlazeIcon->setPixmap(QPixmap()); // hidden for 1s
+    {
+        // Same-size transparent pixmap: the icon "disappears" for 1s without
+        // collapsing the status-bar layout and without ever touching the
+        // white blaze_icon_off.png asset.
+        QPixmap blank(red.size());
+        blank.fill(Qt::transparent);
+        labelBlazeIcon->setPixmap(blank);
+    }
 }
 
 void BlazecoinGUI::message(const QString &title, const QString &message, unsigned int style, bool *ret)
