@@ -125,6 +125,18 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForCStrings(QTextCodec::codecForTr());
 #endif
 
+#if defined(Q_OS_LINUX)
+    // The wallet uses a frameless main window whose title-bar dragging relies
+    // on the windowing system honouring client-driven window moves. Wayland
+    // forbids that, and Qt 5.15's Wayland backend does not reliably implement
+    // startSystemMove(), so the window cannot be repositioned under a native
+    // Wayland session. Force the X11 (XWayland) platform unless the user has
+    // explicitly chosen one. XWayland is present by default on Ubuntu/GNOME
+    // desktops and supports interactive window moves.
+    if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
+        qputenv("QT_QPA_PLATFORM", "xcb");
+#endif
+
     Q_INIT_RESOURCE(blazecoin);
     QApplication app(argc, argv);
 
