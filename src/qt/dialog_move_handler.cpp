@@ -2,6 +2,7 @@
 #include <QEvent>
 #include <QMouseEvent>
 #include <QWidget>
+#include <QWindow>
 
 DialogMoveHandler::DialogMoveHandler(QWidget *target)
     : QObject(target)
@@ -18,9 +19,25 @@ bool DialogMoveHandler::eventFilter(QObject *obj, QEvent *event)
     case QEvent::MouseButtonPress:
         if ( mouseEvent->button() == Qt::LeftButton)
         {
-            _moving = true;
-            _lastPosition = mouseEvent->globalPos();
-            return true;
+            QWidget* target = qobject_cast<QWidget*>(parent());
+            if (target)
+            {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+                // Let the windowing system perform the move. This is the only
+                // approach that works under Wayland, which forbids a client
+                // from reading or setting its own absolute window position
+                // (manual move() below is silently ignored there). It also
+                // works correctly on X11 and Windows.
+                QWindow* handle = target->window()->windowHandle();
+                if (handle && handle->startSystemMove())
+                    return true;
+#endif
+                // Fallback: legacy manual drag, for older Qt or platforms
+                // where startSystemMove() is unsupported and reports failure.
+                _moving = true;
+                _lastPosition = mouseEvent->globalPos();
+                return true;
+            }
         }
         break;
     case QEvent::MouseMove:
