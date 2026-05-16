@@ -95,6 +95,29 @@
 
 const QString BlazecoinGUI::DEFAULT_WALLET = "~Default";
 
+// The linux-branch blaze_icon_on.png asset is blank (the red variant is
+// dev-branch work that is deliberately kept off this branch). Synthesize the
+// red status icon at runtime by tinting the globe shape from
+// blaze_icon_off.png, so no separate binary asset / dev merge is needed.
+static QPixmap blazeRedIcon()
+{
+    static QPixmap cached;
+    if (cached.isNull())
+    {
+        QPixmap shape(":/res/blaze_icon_off.png");
+        QPixmap red(shape.size());
+        red.fill(Qt::transparent);
+        QPainter p(&red);
+        p.drawPixmap(0, 0, shape);
+        // Keep the globe's alpha shape, recolour it solid red.
+        p.setCompositionMode(QPainter::CompositionMode_SourceIn);
+        p.fillRect(red.rect(), QColor(0xC8, 0x1E, 0x1E));
+        p.end();
+        cached = red;
+    }
+    return cached;
+}
+
 BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -224,11 +247,11 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
     frameBlocksLayout->setSpacing(3);
     labelEncryptionIcon = new QLabel();
 	labelBlazeIcon = ui->label_blaze;
-    // Force the red Blaze icon up front so the white blaze_icon_off.png the
-    // .ui sets as label_blaze's default is never shown: setNumBlocks() can
+    // Force the synthesized red icon up front so the white blaze_icon_off.png
+    // the .ui sets as label_blaze's default is never shown: setNumBlocks() can
     // early-return (0 connections / no block source) before it touches the
     // icon, which otherwise leaves the Designer default (white) on screen.
-    labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+    labelBlazeIcon->setPixmap(blazeRedIcon());
     // labelConnectionsIcon = new QLabel();
     labelConnectionsIcon = ui->label_14;
     // labelBlocksIcon = new QLabel();
@@ -743,7 +766,7 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
         //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_4.png"));
         // Up to date: stop blinking, show a solid red Blaze icon.
         blazeBlinkTimer->stop();
-		labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+		labelBlazeIcon->setPixmap(blazeRedIcon());
         overviewPage->showOutOfSyncWarning(false);
     }
     else
@@ -754,7 +777,7 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
         if (!blazeBlinkTimer->isActive())
         {
             blazeBlinkOn = true;
-            labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+            labelBlazeIcon->setPixmap(blazeRedIcon());
             blazeBlinkTimer->start();
         }
 
@@ -782,7 +805,7 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
 void BlazecoinGUI::blinkBlazeIcon()
 {
     blazeBlinkOn = !blazeBlinkOn;
-    QPixmap red(":/res/blaze_icon_on.png");
+    QPixmap red = blazeRedIcon();
     if (blazeBlinkOn)
     {
         labelBlazeIcon->setPixmap(red);
