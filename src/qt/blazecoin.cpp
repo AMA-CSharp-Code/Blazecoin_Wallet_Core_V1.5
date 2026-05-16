@@ -135,6 +135,16 @@ int main(int argc, char *argv[])
     // desktops and supports interactive window moves.
     if (qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
         qputenv("QT_QPA_PLATFORM", "xcb");
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    // Under the forced XWayland platform, Qt no longer gets the per-monitor
+    // scaling the Wayland compositor applied, so the whole UI renders tiny on
+    // high-DPI laptop panels (and the small status icon downsamples to a near
+    // white blob). Opt in to Qt's high-DPI scaling. QT_SCALE_FACTOR and
+    // QT_SCREEN_SCALE_FACTORS still override this for manual fine-tuning.
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 #endif
 
     Q_INIT_RESOURCE(blazecoin);
