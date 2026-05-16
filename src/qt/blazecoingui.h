@@ -33,6 +33,7 @@ class QUrl;
 class QListWidget;
 class QPushButton;
 class QAction;
+class QTimer;
 QT_END_NAMESPACE
 
 namespace Ui {
@@ -132,6 +133,9 @@ private:
     RPCConsole *rpcConsole;
 
     QMovie *syncIconMovie;
+    /** Blinks the red Blaze status icon (1s on / 1s off) while the chain syncs */
+    QTimer *blazeBlinkTimer;
+    bool blazeBlinkOn;
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
 
@@ -188,6 +192,9 @@ private slots:
     void menuFileRequested();
     void menuOperationsRequested();
     void menuSettingsRequested();
+
+    /** Toggle the Blaze status icon on/off while syncing (blink) */
+    void blinkBlazeIcon();
 
     /** Switch to overview (home) page */
     void gotoOverviewPage();

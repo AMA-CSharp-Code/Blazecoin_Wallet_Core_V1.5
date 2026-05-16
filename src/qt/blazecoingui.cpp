@@ -263,6 +263,13 @@ BlazecoinGUI::BlazecoinGUI(bool fIsTestnet, QWidget *parent) :
 
     syncIconMovie = new QMovie(":/movies/update_spinner", "mng", this);
 
+    // Blink the red Blaze status icon while the chain is syncing: visible for
+    // 1s, hidden for 1s. Solid red (no blink) once up to date.
+    blazeBlinkOn = true;
+    blazeBlinkTimer = new QTimer(this);
+    blazeBlinkTimer->setInterval(1000);
+    connect(blazeBlinkTimer, SIGNAL(timeout()), this, SLOT(blinkBlazeIcon()));
+
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
@@ -729,20 +736,22 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
     {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_4.png"));
+        // Up to date: stop blinking, show a solid red Blaze icon.
+        blazeBlinkTimer->stop();
 		labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
         overviewPage->showOutOfSyncWarning(false);
     }
     else
     {
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
-        // labelBlocksIcon->setMovie(syncIconMovie);
-        //if (count < nTotalBlocks / 3)
-        //    labelBlocksIcon->setPixmap(QPixmap(":/res/sync_1.png"));
-        //else if (count < 2 * nTotalBlocks / 3)
-        //labelBlocksIcon->setPixmap(QPixmap(":/res/sync_2.png"));
-        //else
-        //    labelBlocksIcon->setPixmap(QPixmap(":/res/sync_3.png"));
-        // syncIconMovie->start();
+        // Syncing: blink the red Blaze icon (1s on / 1s off). Start it once
+        // and let it run; setNumBlocks() is called repeatedly during sync.
+        if (!blazeBlinkTimer->isActive())
+        {
+            blazeBlinkOn = true;
+            labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+            blazeBlinkTimer->start();
+        }
 
         overviewPage->showOutOfSyncWarning(true);
     }
@@ -763,6 +772,15 @@ void BlazecoinGUI::setNumBlocks(int count, int nTotalBlocks)
     labelBlazeIcon->setToolTip(tooltip);
     progressBarLabel->setToolTip(tooltip);
     progressBar->setToolTip(tooltip);
+}
+
+void BlazecoinGUI::blinkBlazeIcon()
+{
+    blazeBlinkOn = !blazeBlinkOn;
+    if (blazeBlinkOn)
+        labelBlazeIcon->setPixmap(QPixmap(":/res/blaze_icon_on.png"));
+    else
+        labelBlazeIcon->setPixmap(QPixmap()); // hidden for 1s
 }
 
 void BlazecoinGUI::message(const QString &title, const QString &message, unsigned int style, bool *ret)
