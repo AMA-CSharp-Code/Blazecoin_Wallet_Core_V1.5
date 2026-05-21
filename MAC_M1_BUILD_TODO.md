@@ -16,7 +16,7 @@ Status:
 - ◐ **Real-world testing in progress** — chain sync + Send/Receive flows are being exercised on the build host. No data-integrity issues found; remaining feedback has been cosmetic and is captured in the commits above.
 - ☐ Lipo-merge `blazecoind` arm64 + x86_64 into a universal CLI binary if you plan to ship the daemon alongside the GUI.
 - ☐ End-to-end test on a clean Mac (no Homebrew) — both Apple Silicon and Intel.
-- ☐ GitHub release (zip + SHA-256 + release notes with first-run instructions).
+- ☑ **GitHub release published:** `v1.5.0-macos.1` — https://github.com/AMA-CSharp-Code/Blazecoin_Wallet_Core_V1.5/releases/tag/v1.5.0-macos.1 (universal zip + SHA-256 `588f60d0…`, ad-hoc signed, first-run instructions in the notes).
 
 The repo's existing build instructions (`START_HERE.md`, `MSYS2-Setup-QuickStart.md`, `VISUAL_STUDIO_BUILD_READY.md`) are Windows-only. This document captures the macOS port.
 
