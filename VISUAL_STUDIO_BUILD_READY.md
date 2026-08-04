@@ -1,5 +1,9 @@
 # Blazecoin V1.5 - Visual Studio Build Ready
 
+> **Note (corrected 2026-04-26):** This document was written during initial V1.5 planning, on the assumption that 0.8.6.2 (the production wallet) had a sync stall around block 2,000,000. Subsequent verification showed that 0.8.6.2 syncs the full ~4.1M-block chain without issue — the production node has been running continuously since 2014. The 2M-block stall was specific to the failed **V2.0** attempt (Bitcoin Core 28.0 base), which motivated V1.5's creation. Any "2M sync wall" framing behind this build setup should be read in that corrected context. See `Blazecoin_V1.5_Technical_Changelog.md` for the accurate post-build account.
+>
+> **Note (2026-08-04):** `boost_system-vc145-mt-x64-1_90.lib` (listed among the link deps below) was later **removed** from the link dependencies — Boost.System has been header-only since Boost 1.69. See `Blazecoin_V1.5_Technical_Changelog.md` §6.4.
+
 **Date:** April 23, 2026  
 **Status:** ✅ Ready to Compile in Visual Studio  
 **Configuration:** Release x64
