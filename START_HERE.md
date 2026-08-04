@@ -1,5 +1,9 @@
 # 🚀 START HERE - Blazecoin V1.5 MinGW Setup
 
+> **Note (corrected 2026-04-26):** This document was written during initial V1.5 planning, on the assumption that 0.8.6.2 (the production wallet) had a sync stall around block 2,000,000. Subsequent verification showed that 0.8.6.2 syncs the full ~4.1M-block chain without issue — the production node has been running continuously since 2014. The 2M-block stall was specific to the failed **V2.0** attempt (Bitcoin Core 28.0 base), which motivated V1.5's creation. Any "2M sync wall" framing behind this setup guide should be read in that corrected context. See `Blazecoin_V1.5_Technical_Changelog.md` for the accurate post-build account.
+>
+> **Note (2026-08-04): this entire MinGW/MSYS2 toolchain path is OBSOLETE.** V1.5 actually shipped via **MSVC 2022 + vcpkg** on Windows and **`makefile.unix`** on Linux — see `Blazecoin_V1.5_Technical_Changelog.md` §11 ("Build environment") for the authoritative build recipe. In addition, the Step-1 script `Setup-MinGW-Environment.ps1` referenced below is an empty 0-byte file, so the steps in this guide cannot be followed as written.
+
 ## Quick Start (3 Simple Steps)
 
 ### Step 1: Setup MinGW Environment

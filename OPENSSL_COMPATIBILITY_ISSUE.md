@@ -1,5 +1,9 @@
 # Blazecoin V1.5 - OpenSSL Compatibility Issue
 
+> **Note (corrected 2026-04-26):** This document was written during initial V1.5 planning, on the assumption that 0.8.6.2 (the production wallet) had a sync stall around block 2,000,000. Subsequent verification showed that 0.8.6.2 syncs the full ~4.1M-block chain without issue — the production node has been running continuously since 2014. The 2M-block stall was specific to the failed **V2.0** attempt (Bitcoin Core 28.0 base), which motivated V1.5's creation. See `Blazecoin_V1.5_Technical_Changelog.md` for the accurate post-build account.
+>
+> **Note (2026-08-04):** **Option 4 (patch Blazecoin for OpenSSL 3.x) is what actually shipped** — see `Blazecoin_V1.5_Technical_Changelog.md` §3 ("OpenSSL 3.x migration") — superseding this document's recommendation of Option 2 (WSL). Also, the claim under "My Recommendation" that WSL compilation "Produces native Windows binary (.exe)" is incorrect: compiling under WSL produces a Linux binary, not a Windows `.exe`.
+
 ## ❌ Current Problem
 
 **Error:** `'bignum_st': base class undefined` and `'BN_init': identifier not found`
