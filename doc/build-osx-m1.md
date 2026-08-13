@@ -1,6 +1,16 @@
 Blazecoin V1.5 build instructions for macOS (Apple Silicon)
 ===========================================================
 
+> **You probably don't need this guide (2026-08-13).** A prebuilt, self-contained
+> **universal** (Apple Silicon + Intel) release exists:
+> [`v1.5.0-macos.1`](https://github.com/AMA-CSharp-Code/Blazecoin_Wallet_Core_V1.5/releases/tag/v1.5.0-macos.1)
+> (published 2026-05-21, built from branch `macos-v1.5.0`) — no Homebrew, Qt or OpenSSL
+> required; see `release/MACOS_RELEASE_NOTES.md` for install/Gatekeeper steps. This guide
+> remains for building from source, and some of its details predate that release (it
+> recommends `openssl@1.1` although the V1.5 codebase carries the OpenSSL 3.x port —
+> changelog §3 — and the data dir is `~/Library/Application Support/BlazecoinV1.5/`
+> per changelog §9.1, not the pre-V1.5 path quoted below).
+
 This document covers building the daemon (`blazecoind`) and the Qt wallet
 (`Blazecoin-Qt.app`) on Apple Silicon Macs (M1/M2/M3) running modern macOS.
 
