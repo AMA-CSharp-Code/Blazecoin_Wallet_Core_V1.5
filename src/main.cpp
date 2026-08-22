@@ -1087,7 +1087,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 }
 
 static const int64 nTargetTimespan = 60 * 60;	// Blazecoin: 1 hour
-static const int64 nTargetSpacing = 30;						// Blazecoin: 15 sec
+static const int64 nTargetSpacing = 30;						// Blazecoin: 30 sec
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 static const int64 nTargetTimespanRe = 60 * 60; // 60 Minutes
 static const int64 nTargetSpacingRe = 1 * 30; // Blazecoin: 30 seconds
