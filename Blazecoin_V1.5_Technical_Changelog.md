@@ -1,6 +1,6 @@
-# Blazecoin V1.5 — Complete Changelog vs Original (0.8.6.2)
+﻿# Blazecoin V1.5 — Complete Changelog vs Original (0.8.6.2)
 
-**Generated:** 2026-04-24 — last updated 2026-08-22 (see the revision table; body sections lag the table for post-April work)
+**Generated:** 2026-04-24 — last updated 2026-08-24 (see the revision table; body sections lag the table for post-April work)
 **Scope:** Every source-level change made to the Blazecoin codebase between the original wpstudio/blazecoin 0.8.6.2 release and the compiled, running V1.5 binary.
 **Validated against:** Production chain via sync test. Genesis hash matches; checkpoints 500K through 4M all match; daemon (blazecoind.exe) and GUI (blazecoin-qt.exe) both build cleanly on MSVC 2022 / Qt 5.15 / vcpkg.
 
@@ -20,8 +20,8 @@
 | 2026-04-27 | §13.7 (new) | Encrypt Wallet (askpassphrasedialog), Sign Message, Verify Message dark-mode finish: outer `QDialog` and `wCaption`/`wHeader` switched to black; `encrypt.png`, `change_pass.png`, `sign_message_icon.png`, `verify_sign.png` recoloured red `#d80317`; "Encrypt wallet" → "Encrypt Wallet"; default `QLabel { color: #000000 }` flipped to white in askpassphrasedialog so labels read on the dark frame. |
 | 2026-04-28 | §13.8 (new) | Branding refresh: splash redesigned around the new neon-red shield artwork with a centred "BlazeCoin" caption baked into the PNG (split-colour: `Blaze` `#e64619` / `Coin` white). Header coin in `blazecoin-logo.png` replaced with the phoenix-medallion artwork, circle-cropped to match the original coin shape; word "Blazecoin" alongside it nudged down 4 px to sit lower against the new coin. Top-right `wallet-header.jpg` corner icon swapped from the small flame-shield to the same neon shield (28→36 px), brightness-keyed so the dark binary-haze background of the source PNG renders transparent over the header gradient; canvas widened from 828→845 px so the icon sits visibly inside the wallet's right margin instead of being clipped by the rounded corner mask. |
 | 2026-04-28 | §13.9 (new) | Dropdown menus (`File`, `Operations`, `Settings`) restyled: `QMenu { background-color }` flipped from red `#9e000f` to solid black; `QMenu::item:selected` background fixed (was `#0099СС` — invalid colour because of two Cyrillic 'С' characters that survived as literal text into Qt's parser, falling back to default highlight blue) → red `#d80317` with white text. Per-action `QIcon` arguments removed from `Exit` (File menu) and `Sign Message` / `Verify Message` (Operations menu) so all entries align to the same left edge. |
-| 2026-04-27 | §13.8 (new) | Close-X (bClose) `background-image` recipe rolled out across all five remaining dialogs (askpassphrasedialog, addressbookpage, aboutdialog, signverifymessagedialog, message_box_dialog) so hover paints red bg under the white X glyph instead of `image:` over `background-color`. |
-| 2026-04-27 | §13.9 (new) | Options page (Common settings + Network) recoloured: `wServiceMessagesHeader_4` strip black, `wContainer` `rgba(0,0,0,180)`, blue text → white, blue accent line → red, buttons restyled like other dialogs, `settings_icon.png` recoloured red. QCheckBox given small `padding: 1px 0; min-height: 14px` to ease the Common-section text clipping that existed in the original wallet. The "Optional transaction fee per kB…" `showNotification(...)` banner in `optionspage.cpp` removed. "Pay transaction fee" → "Pay Optional Transaction Fee". |
+| 2026-04-27 | §13.23 *(renumbered 2026-08-24 — this row and the next were a duplicate §13.8/§13.9 pair; the body sections §13.8/§13.9 belong to the 2026-04-28 rows)* | Close-X (bClose) `background-image` recipe rolled out across all five remaining dialogs (askpassphrasedialog, addressbookpage, aboutdialog, signverifymessagedialog, message_box_dialog) so hover paints red bg under the white X glyph instead of `image:` over `background-color`. |
+| 2026-04-27 | §13.24 *(renumbered 2026-08-24, see previous row)* | Options page (Common settings + Network) recoloured: `wServiceMessagesHeader_4` strip black, `wContainer` `rgba(0,0,0,180)`, blue text → white, blue accent line → red, buttons restyled like other dialogs, `settings_icon.png` recoloured red. QCheckBox given small `padding: 1px 0; min-height: 14px` to ease the Common-section text clipping that existed in the original wallet. The "Optional transaction fee per kB…" `showNotification(...)` banner in `optionspage.cpp` removed. "Pay transaction fee" → "Pay Optional Transaction Fee". |
 | 2026-04-27 | §13.10 (new) | "Check updates at startup" feature removed. The checkbox was permanently `enabled=false` in the .ui, the model forced `bCheckUpdatesAtStartup = false` regardless of saved setting, and `getCheckUpdatesAtStartup()` was never called from anywhere — pure UI placeholder for an unimplemented feature. Removed: the `QCheckBox` widget; `OptionsModel::CheckUpdatesAtStartup` enum entry, getter, member; `Init()` / `data()` / `setData()` cases; mapper line and `setCheckUpdatesAtStartup()` setter on `OptionsDialog`. |
 | 2026-04-27 | §13.11 (new) | Capitalisation pass: "Common settings, Network" → "Common Settings, Network"; "Service messages" → "Service Messages" (File menu); "Sign &message…" → "Sign &Message…", "&Verify message…" → "&Verify Message…" (Operations menu, both action declarations and right-click context menu via replace_all); "Command-line options" → "Command-line Options". |
 | 2026-04-27 | §13.12 (new) | Splash screen redesign: "Coin" word recoloured from black to white (only near-black pixels in the bottom 45 % flipped, so the shield's interior stays dark); `splash.png` red bg flipped to black with a 3 px red `#d80317` border drawn on the perimeter (~213 K bg pixels matched against `R>110 ∧ G<40 ∧ B<40 ∧ R−G>80`, so the orange flame and silver shield are spared); same applied to `splash_testnet.png`. The runtime status message colour in `blazecoin.cpp:90` (`splashref->showMessage(...)`) flipped from `QColor(55,55,55)` to white. |
@@ -35,10 +35,12 @@
 | 2026-05-08 | §13.20 (new) | Status-bar progress label (`label_12` in `mainwindow.ui`) was sized for the 22-char placeholder "Synchronizing Network" and right-aligned at 143 px — runtime strings "Synchronizing with network…", "Importing blocks from disk…", "Reindexing blocks on disk…" (all ~28 chars / ~155 px in 8 pt) had their leading characters clipped on Linux Qt 5, so users saw "chronizing with network…". Fix: alignment switched from `Qt::AlignRight\|Qt::AlignTrailing` to `Qt::AlignLeading\|Qt::AlignLeft` (no leading gap on shorter strings either), label width 143→165 px, progress bar shifted x 161→185 with width tightened 655→640 so its right edge lands at x 825 — 5 px clear of the connection icon at x 830, matching the 5–9 px text-to-bar gap on the left. Strictly a Qt 5 / Linux fix; MSVC Qt 5 on Windows happened to render the same string within the 143 px box without truncation due to a slightly narrower default font metric. |
 | 2026-05-09 | §13.21 (new) | All `QMessageBox::information / warning / critical / question` call sites (33 across 11 GUI files) converted to a themed `MessageBoxDialog` flow. Four new static helpers — `information() / warning() / critical() / question()` — added to `MessageBoxDialog` so call sites read like the QMessageBox API (`MessageBoxDialog::critical(this, title, text)`); `question()` returns `QDialog::Accepted` / `QDialog::Rejected`, replacing the handful of `retval == QMessageBox::Yes` checks. `message_box_dialog.ui` palette flipped to match the rest of the dark wallet: outer dialog and `wCaption` strip black `rgb(0, 0, 0)` (was Microsoft-blue `rgb(0, 82, 174)`), frame body `rgba(0, 0, 0, 180)` (was `#D8DFE9`), labels white `#FFFFFF` (was `#0052AE` / `#E9D9D8`), buttons `rgba(0, 0, 0, 200)` with red `#d80317` hover/pressed (was `#758EB3` / `#0099CC`). Capitalisation pass on the visible titles: "Confirm wallet encryption" → "Confirm Wallet Encryption"; post-encryption warning "Wallet encrypted" → "Wallet Encrypted". The raw `QMessageBox` instance in `BlazecoinGUI::message` (`blazecoingui.cpp:810`, the system-tray modal fallback driven by `CClientUIInterface`) was deliberately left intact — it consumes a `QMessageBox::StandardButton`-typed mask from the lib core and isn't a user-visible Blazecoin dialog. |
 | 2026-05-09 | §13.22 (new) | Follow-up Title Case sweep across the remaining dialog headers + one MSVC-specific include fix on top of §13.21. Title-case adjustments: `askpassphrasedialog.cpp` "Wallet encryption failed" → "Wallet Encryption Failed" (4 sites), "Wallet unlock failed" → "Wallet Unlock Failed", "Wallet decryption failed" → "Wallet Decryption Failed", "Unlock wallet" → "Unlock Wallet" (window title + lbTitle), "Decrypt wallet" → "Decrypt Wallet" (idem), "Change passphrase" → "Change Passphrase" (idem); `addressbookpage.cpp` + `transactionview.cpp` "Error exporting" → "Error Exporting"; `blazecoingui.cpp` "Confirm transaction fee" → "Confirm Transaction Fee"; `blazecoin.cpp` "Runaway exception" → "Runaway Exception"; `optionsdialog.cpp` + `optionspage.cpp` "Confirm options reset" → "Confirm Options Reset"; `sendcoinsdialog.cpp` "Confirm send coins" → "Confirm Send Coins"; `editaddressdialog.cpp` "New sending address" / "Edit sending address" → "New Sending Address" / "Edit Sending Address" (the Receiving variants were already title-cased per §13.4). Build fix: `addressbookpage.cpp` had `#include "message_box_dialog.h"` placed inside the `#ifdef USE_QRCODE` block by §13.21's auto-rewrite — MSVC's `blazecoin-qt.vcxproj` does not define `USE_QRCODE`, so the include compiled out and link of `MessageBoxDialog::critical` fails; the include was moved out of the `#ifdef`. |
-| 2026-05-21 | Release (macOS) | **`v1.5.0-macos.1` — the first native macOS release, a UNIVERSAL binary (Apple Silicon M1–M4 + Intel), published on GitHub from branch `macos-v1.5.0`** (not merged into `linux`/`dev`). Self-contained `Blazecoin V1.5.app` — no Homebrew/Qt/OpenSSL install needed, superseding this doc set's build-from-source-only picture of macOS (see the banner in `doc/build-osx-m1.md`). Tested end-to-end (full sync + send + receive) on both architectures. Ad-hoc signed, NOT notarized — first launch needs right-click→Open (or `xattr -cr`). Data dir `~/Library/Application Support/BlazecoinV1.5/` (matches §9.1). Asset `Blazecoin-V1.5-macOS-universal.zip` (~52 MB), sha256 `588f60d0…c88d8cdb9`. Known limitations: UPnP disabled (forward TCP 55414 manually); a few toolbar icons not yet @2x. Release notes: `release/MACOS_RELEASE_NOTES.md`. *(Row added retroactively 2026-08-13 — the release predated it by nearly three months with no changelog record.)* |
+| 2026-05-09 | Release (Linux) | **`v1.5.0-linux` — Linux x86_64, tagged at `4e52cb4` on `linux`.** Asset `blazecoin-v1.5.0-linux-x86_64.tar.gz`; release notes `release/RELEASE_NOTES.md`. Note: that file's "Source-level changes vs v1.5.0" table lists the §13.21 MessageBoxDialog + Title Case work later shipped to Windows as **1.5.1** — the asset is correctly versioned 1.5.0 because the tag predates the `9889468` version bump. *(Row added retroactively 2026-08-24 — the release event had build notes in §13.19 but no table row.)* |
 | 2026-05-13 | Release (Windows 1.5.1) | **`v1.5.1` — Windows x64, tagged on `dev`** (`ed3a0e8`; the `linux` branch carries the same bump as `9889468`). Delta vs `v1.5.0`: the §13.21 `MessageBoxDialog` helpers + §13.22 Title Case sweep, and the status-bar Blaze icon tinted red `#d80317`, blinking 1 s on/off while syncing and solid red when synced (replaces the near-blank `blaze_icon_on.png`). Asset `blazecoin-v1.5.1-windows-x64.zip` ≈ 17 MB, sha256 `92c16d0e…891d73`; bundle `blazecoin-qt.exe` `8ba7ac15…d870f9`, `blazecoind.exe` `c6058a01…27268c`. Release notes: `release/WINDOWS_RELEASE_NOTES.md`. *(Row added retroactively 2026-08-22.)* |
+| 2026-05-21 | Release (macOS) | **`v1.5.0-macos.1` — the first native macOS release, a UNIVERSAL binary (Apple Silicon M1–M4 + Intel), published on GitHub from branch `macos-v1.5.0`** (not merged into `linux`/`dev`). Self-contained `Blazecoin V1.5.app` — no Homebrew/Qt/OpenSSL install needed, superseding this doc set's build-from-source-only picture of macOS (see the banner in `doc/build-osx-m1.md`). Tested end-to-end (full sync + send + receive) on both architectures. Ad-hoc signed, NOT notarized — first launch needs right-click→Open (or `xattr -cr`). Data dir `~/Library/Application Support/BlazecoinV1.5/` (matches §9.1). Asset `Blazecoin-V1.5-macOS-universal.zip` (~52 MB), sha256 `588f60d0…c88d8cdb9`. Known limitations: UPnP disabled (forward TCP 55414 manually); a few toolbar icons not yet @2x. Release notes: `release/MACOS_RELEASE_NOTES.md`. *(Row added retroactively 2026-08-13 — the release predated it by nearly three months with no changelog record.)* |
 | 2026-05-16 | `linux` branch only | Post-release Linux/GUI work that lives ONLY on `linux` (never merged to `dev`): frameless-window drag under Wayland via `startSystemMove` (`0339618`), force the xcb platform so the window runs under XWayland (`bafe3d8`), Qt high-DPI scaling (`634bf8c`), `-lboost_system` dropped from the Linux link line — header-only since Boost 1.69, breaks the link on modern distros (`64bbecd`), status icon kept red always with the blink done via a transparent pixmap (`ad1f756`) and the red Blaze icon synthesized from the globe shape because the branch has no red asset (`d706910`). `dev` meanwhile holds the Title Case sweep `4c12133` (§13.22) and the §12 superseded note `80bc689` that `linux` received as ported text. *(Row added retroactively 2026-08-22.)* |
 | 2026-08-22 | header, §2.2, §12, this table | Docs re-trued: the second `2000 → 50000000` edit at `src/main.cpp:2285` (inv-relay guard, not a header limit) is now recorded in §2.2; 1.5.1 + linux-branch rows added above; published `v1.5.0` asset hashes recorded in §12 (the repo's `release/blazecoin-v1.5.0-windows-x64.sha256sums.txt` describes a different local build); stale `// Blazecoin: 15 sec` comment on `nTargetSpacing` fixed to 30 sec; the 2026-08-04 / 08-13 doc commits (`48c649f`, `d91978e`) cherry-picked onto `dev` so the GitHub default branch no longer shows un-bannered planning docs. |
+| 2026-08-24 | structure, §2.1, §2.2, §12, §13.7, this table | Doc-hygiene pass: §12 moved above §13 (numbering order); §9.1 re-levelled + moved before §9.2; missing §13.7 body added; duplicate 04-27 §13.8/§13.9 rows renumbered §13.23/§13.24; macOS/Windows release rows put in date order; Linux `v1.5.0-linux` release row added; §2.1 notes the current tree reports 1.5.1; §2.2 heading corrected (2,000 → 50,000,000 headers per reply, not "2M→50M"); §12 records the local `v1.5.0` zip as a third unrecorded artifact; `CHANGES_V1.5.md` line-number/checkpoint-arithmetic corrections banner added; `.gitignore` gains `msbuild*.log`. |
 
 ---
 
@@ -72,8 +74,10 @@ COPYRIGHT_YEAR 2013  →  2026
 ```
 
 Wallet now reports: `Blazecoin version v1.5.0.0-<commit>-beta`.
+*(Since the 1.5.1 release — `9889468` on `linux`, `ed3a0e8` on `dev` — `CLIENT_VERSION_REVISION` is
+`1`, so the current tree reports `v1.5.1.0-<commit>-beta`. Noted 2026-08-24.)*
 
-### 2.2 Header download limit raised from 2M to 50M
+### 2.2 Header-response cap raised (2,000 → 50,000,000 headers per reply)
 
 **File:** `src/main.cpp`
 
@@ -442,6 +446,20 @@ blazecoin-qt.pro          MSVC-aware: gated GCC-only flags, MSVC defines
 | `blazecoin-qt.exe` (GUI) builds and links | Pass — 4.5 MB binary at `release/blazecoin-qt.exe` |
 | GUI defaults to `%APPDATA%\BlazecoinV1.5\` | Pass — daemon and GUI both honor the per-version path |
 
+### 9.1 Per-version data-directory isolation
+
+Both `blazecoind.exe` and `blazecoin-qt.exe` now default to a V1.5-specific data directory so they never collide with the production 0.8.6.2 wallet's storage:
+
+| Platform | Before | After |
+|----------|--------|-------|
+| Windows | `%APPDATA%\Blazecoin\` | `%APPDATA%\BlazecoinV1.5\` |
+| macOS | `~/Library/Application Support/Blazecoin/` | `~/Library/Application Support/BlazecoinV1.5/` |
+| Unix | `~/.blazecoin/` | `~/.blazecoinv1.5/` |
+
+Implemented in `src/util.cpp` `GetDefaultDataDir()`. Users who pass an explicit `-datadir=...` are unaffected.
+
+The Qt application name was also bumped from `Blazecoin-Qt` to `Blazecoin-Qt-V1.5` (`src/qt/blazecoin.cpp`) so V1.5's `QSettings` (window geometry, options dialog state, etc.) live in a separate registry/INI group from the production wallet.
+
 ### 9.2 RPC throughput benchmark (added 2026-04-27)
 
 Direct head-to-head between V1.5 (MSVC 2022 build) and stock 0.8.6.2 (the 2019 MinGW production binary at `C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe`). Both daemons running, both at chain tip (4,105,596). 1000 calls per HTTP request via JSON-RPC batching, best of 3 runs:
@@ -455,22 +473,6 @@ Direct head-to-head between V1.5 (MSVC 2022 build) and stock 0.8.6.2 (the 2019 M
 V1.5 is consistently 5–11 % faster across the three operation types. Lighter ops (in-memory state lookups) benefit more — those are tight code paths where the modern MSVC optimizer beats the 2019 MinGW build. Heavier ops (disk read + JSON serialization for `getblock`) benefit less because their time is dominated by I/O and parser work, neither of which is affected by compiler choice.
 
 Reproducible via `./bench-rpc-batch.sh [N]` from the repo root (defaults to N=1000 calls). Requires both daemons running on their respective ports; edit credentials in the script if reusing.
-
----
-
-## 9.1 Per-version data-directory isolation
-
-Both `blazecoind.exe` and `blazecoin-qt.exe` now default to a V1.5-specific data directory so they never collide with the production 0.8.6.2 wallet's storage:
-
-| Platform | Before | After |
-|----------|--------|-------|
-| Windows | `%APPDATA%\Blazecoin\` | `%APPDATA%\BlazecoinV1.5\` |
-| macOS | `~/Library/Application Support/Blazecoin/` | `~/Library/Application Support/BlazecoinV1.5/` |
-| Unix | `~/.blazecoin/` | `~/.blazecoinv1.5/` |
-
-Implemented in `src/util.cpp` `GetDefaultDataDir()`. Users who pass an explicit `-datadir=...` are unaffected.
-
-The Qt application name was also bumped from `Blazecoin-Qt` to `Blazecoin-Qt-V1.5` (`src/qt/blazecoin.cpp`) so V1.5's `QSettings` (window geometry, options dialog state, etc.) live in a separate registry/INI group from the production wallet.
 
 ---
 
@@ -542,6 +544,23 @@ $env:PATH = "C:\vcpkg\installed\x64-windows\bin;C:\vcpkg\installed\x64-windows\t
 ```
 
 The GUI defaults to `%APPDATA%\BlazecoinV1.5\` (see § 9.1).
+
+---
+
+## 12. Known follow-ups
+
+*(Section moved above §13 on 2026-08-24 — it had been appended after §13, breaking the numbering order.)*
+
+- **Cross-version peer test** paused at ~107K blocks. Resume by relaunching the test peer (stock 0.8.6.2 from `C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe`) with `-datadir=C:\blazecoin-data\TestPeer`. It will continue downloading from V1.5 toward 4.1M tip.
+- **Sanitize local paths** in `MSYS2-Setup-QuickStart.md` and `OPENSSL_COMPATIBILITY_ISSUE.md` (a few `C:\path\to\...` strings) if the repo is ever made public.
+- **Translation files** (`src/qt/locale/*.qm`) are committed as zero-byte placeholders. To regenerate real translations, install vcpkg's `qt5-tools` and re-run `qmake` without the `!win32-msvc*` guard around the `lrelease` block in `blazecoin-qt.pro`.
+- **`USE_UPNP` in the GUI build** is currently disabled (the bundled `net.cpp` UPNP code uses an older miniupnpc API). The daemon build also doesn't define it. Re-enable by updating the `upnpDiscover()` and `UPNP_GetValidIGD()` call sites to the modern signatures.
+- **`USE_QRCODE`** disabled — receive-address QR codes aren't built. Add `qrencode` to vcpkg and pass `USE_QRCODE=1` to qmake to re-enable.
+- **`QSound`** sound notifications on incoming transactions disabled (`src/qt/blazecoingui.cpp:856`). To re-enable: add `qt5-multimedia` and switch to `QSoundEffect`.
+- **Long-term:** V2.0 should be an incremental Bitcoin Core rebase (e.g. 0.8 → 0.12 → 0.16 → 0.21 → 28.x) using V1.5 as the proven baseline rather than the failed jump-to-28.0 attempt. *(Superseded 2026-05-05: the direct jump-to-28.0 was unblocked by filling four chainparams TODOs in V2's `kernel/chainparams.cpp` — incremental rebase is no longer needed. See V2's `BLAZECOIN_V2.md` "Recent work" for the actual unblock path.)*
+- **Revert `src/main.cpp:2285` (`nStartingHeight - 50000000`) to the original `- 2000`** — the edit was a misread of the header-limit change (see §2.2); behaviourally a no-op today, but it is noise in the consensus-adjacent diff. *(Added 2026-08-22.)*
+- **Published-asset hashes vs the repo's local sums files (recorded 2026-08-22):** the GitHub `v1.5.0` asset `Blazecoin-V1.5.0-windows-x64.zip` is sha256 `7518b9fb0d2113ff03326e61c9dc9481c77a1c22d792ffb9ff50a8ebb0f6f68f` and the `blazecoin-qt.exe` inside it is `a06acd080c0229fd5c3bf34a1b90c29aa15f4974800d881bb3de1ce4c21dee70` (verified by downloading the asset). The gitignored `release/blazecoin-v1.5.0-windows-x64.sha256sums.txt` on this box lists `431c260e…` for `blazecoin-qt.exe` — a different local build, so trust the GitHub release digest, not that file. The local `release/blazecoin-v1.5.0-windows-x64.zip` beside it is a **third** artifact (sha256 `05286f26dc00ef1ac5efcbe12038e35e2408885e10e966fcce1b4a45bf7adb5d`, verified 2026-08-24) — neither the published asset nor anything any doc records; do not treat it as the release either. `v1.5.1` hashes (zip `92c16d0e…`, exe `8ba7ac15…`, daemon `c6058a01…`) agree across the release body, the bundle's `sha256sums.txt` and the Desktop extract.
+- **Branch hygiene:** `macos-v1.5.0` (tag `v1.5.0-macos.1`) exists only on the `mine` remote — not merged, not fetched locally; `linux` carries six Wayland/high-DPI/icon commits `dev` lacks and `dev` carries the §13.22 Title Case sweep `linux` lacks (see the 2026-05-16 revision row). A release of 1.5.2 from either branch should first reconcile the two. *(Added 2026-08-22.)*
 
 ---
 
@@ -768,6 +787,21 @@ splash/icon `.cpp` with `res.qrc` content and produce a broken splash. The
 | `blazecoin.qrc` | `blazecoin` | `release/qrc_blazecoin.cpp` |
 | `res.qrc` | `res` | `release/qrc_res.cpp` |
 
+### 13.7 Encrypt Wallet / Sign Message / Verify Message dark-mode finish
+
+*(Body section added retroactively 2026-08-24 — the 2026-04-27 revision row existed with no body,
+leaving §13.6 → §13.8 a numbering gap.)*
+
+The same dark recipe as §13.4/§13.5, applied to the three remaining dialogs:
+
+- `askpassphrasedialog` (Encrypt Wallet / passphrase flows), Sign Message and Verify Message: the
+  outer `QDialog` and the `wCaption`/`wHeader` strips switched from blue to black.
+- Icons `encrypt.png`, `change_pass.png`, `sign_message_icon.png`, `verify_sign.png` recoloured
+  red `#d80317`.
+- Capitalisation: "Encrypt wallet" → "Encrypt Wallet".
+- `askpassphrasedialog`'s default `QLabel { color: #000000 }` flipped to white so labels read on
+  the dark frame.
+
 ### 13.8 Branding refresh — splash and header logos
 
 The Bitcoin-era splash and the `:/res/blazecoin-logo.png` header banner
@@ -822,16 +856,3 @@ inconsistent left margin. Removing the three `QIcon` arguments lets
 all entries align to the same text gutter.
 
 ---
-
-## 12. Known follow-ups
-
-- **Cross-version peer test** paused at ~107K blocks. Resume by relaunching the test peer (stock 0.8.6.2 from `C:\path\to\Desktop\Blazecoin\blazecoin-qt.exe`) with `-datadir=C:\blazecoin-data\TestPeer`. It will continue downloading from V1.5 toward 4.1M tip.
-- **Sanitize local paths** in `MSYS2-Setup-QuickStart.md` and `OPENSSL_COMPATIBILITY_ISSUE.md` (a few `C:\path\to\...` strings) if the repo is ever made public.
-- **Translation files** (`src/qt/locale/*.qm`) are committed as zero-byte placeholders. To regenerate real translations, install vcpkg's `qt5-tools` and re-run `qmake` without the `!win32-msvc*` guard around the `lrelease` block in `blazecoin-qt.pro`.
-- **`USE_UPNP` in the GUI build** is currently disabled (the bundled `net.cpp` UPNP code uses an older miniupnpc API). The daemon build also doesn't define it. Re-enable by updating the `upnpDiscover()` and `UPNP_GetValidIGD()` call sites to the modern signatures.
-- **`USE_QRCODE`** disabled — receive-address QR codes aren't built. Add `qrencode` to vcpkg and pass `USE_QRCODE=1` to qmake to re-enable.
-- **`QSound`** sound notifications on incoming transactions disabled (`src/qt/blazecoingui.cpp:856`). To re-enable: add `qt5-multimedia` and switch to `QSoundEffect`.
-- **Long-term:** V2.0 should be an incremental Bitcoin Core rebase (e.g. 0.8 → 0.12 → 0.16 → 0.21 → 28.x) using V1.5 as the proven baseline rather than the failed jump-to-28.0 attempt. *(Superseded 2026-05-05: the direct jump-to-28.0 was unblocked by filling four chainparams TODOs in V2's `kernel/chainparams.cpp` — incremental rebase is no longer needed. See V2's `BLAZECOIN_V2.md` "Recent work" for the actual unblock path.)*
-- **Revert `src/main.cpp:2285` (`nStartingHeight - 50000000`) to the original `- 2000`** — the edit was a misread of the header-limit change (see §2.2); behaviourally a no-op today, but it is noise in the consensus-adjacent diff. *(Added 2026-08-22.)*
-- **Published-asset hashes vs the repo's local sums files (recorded 2026-08-22):** the GitHub `v1.5.0` asset `Blazecoin-V1.5.0-windows-x64.zip` is sha256 `7518b9fb0d2113ff03326e61c9dc9481c77a1c22d792ffb9ff50a8ebb0f6f68f` and the `blazecoin-qt.exe` inside it is `a06acd080c0229fd5c3bf34a1b90c29aa15f4974800d881bb3de1ce4c21dee70` (verified by downloading the asset). The gitignored `release/blazecoin-v1.5.0-windows-x64.sha256sums.txt` on this box lists `431c260e…` for `blazecoin-qt.exe` — a different local build, so trust the GitHub release digest, not that file. `v1.5.1` hashes (zip `92c16d0e…`, exe `8ba7ac15…`, daemon `c6058a01…`) agree across the release body, the bundle's `sha256sums.txt` and the Desktop extract.
-- **Branch hygiene:** `macos-v1.5.0` (tag `v1.5.0-macos.1`) exists only on the `mine` remote — not merged, not fetched locally; `linux` carries six Wayland/high-DPI/icon commits `dev` lacks and `dev` carries the §13.22 Title Case sweep `linux` lacks (see the 2026-05-16 revision row). A release of 1.5.2 from either branch should first reconcile the two. *(Added 2026-08-22.)*
