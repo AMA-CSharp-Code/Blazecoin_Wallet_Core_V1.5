@@ -1,6 +1,15 @@
 # Blazecoin Core V1.5 - Change Summary
 
 > **Note (corrected 2026-04-26):** This document was written during initial V1.5 planning, on the assumption that 0.8.6.2 (the production wallet) had a sync stall around block 2,000,000. Subsequent verification showed that 0.8.6.2 syncs the full ~4.1M-block chain without issue — the production node has been running continuously since 2014. The 2M-block stall was specific to the failed **V2.0** attempt (Bitcoin Core 28.0 base), which motivated V1.5's creation. V1.5's actual contributions are: modern toolchain compatibility (MSVC 2022 / OpenSSL 3.x / Boost 1.90), latent NDEBUG/assert bug fixes inherited from upstream, and proactive checkpoint + header-limit additions for future chain growth. The "2M sync wall" wording below should be read in that corrected context. See `Blazecoin_V1.5_Technical_Changelog.md` for the accurate post-build account.
+>
+> **Note (corrected 2026-08-24):** two further inaccuracies in the body below, left in place as the
+> historical record: (1) the `src/main.cpp` **line numbers 3603 and 2281 are the ORIGINAL 0.8.6.2
+> tree's** — in the V1.5 tree those edits live at **3607 and 2285** (the Technical Changelog §2.2
+> cites the correct ones); this applies to the section headers, the verification checklist and the
+> troubleshooting entry. (2) The checkpoint accounting "16 (8 original + 2 recovered + 8 new)" is
+> wrong twice over: 8+2+8=18, and blocks 215,000 / 363,120 were **never missing** — both are present
+> verbatim in `Blazecoin_Original/src/checkpoints.cpp`. The correct decomposition is **8 original +
+> 8 new = 16**.
 
 **Created:** April 23, 2026  
 **Purpose:** Fix wallet sync stopping at ~2M blocks  
@@ -102,7 +111,7 @@ if (nBestHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 50000
    - Transaction count: `8` (between checkpoints)
    - Estimated daily transactions: `100`
 
-**Total Checkpoints:** 16 (8 original + 2 recovered + 8 new)
+**Total Checkpoints:** 16 (8 original + 2 recovered + 8 new) *(corrected 2026-08-24: 8 original + 8 new = 16 — the "2 recovered" were already in the original tree; see the header note)*
 
 ---
 
