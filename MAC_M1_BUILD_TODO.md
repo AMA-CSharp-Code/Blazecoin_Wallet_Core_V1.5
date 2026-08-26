@@ -22,6 +22,53 @@ The repo's existing build instructions (`START_HERE.md`, `MSYS2-Setup-QuickStart
 
 ---
 
+## Session checkpoint (2026-08-26) — Phoenix-413 on the macOS branch
+
+**What happened:** the Phoenix-413 retarget (V1.5.2, INERT — `dev` commit `2ad8af7`)
+was cherry-picked onto `macos-v1.5.0` as `fb94a58`, built, and installed.
+
+- **Cherry-pick:** `src/main.cpp` merged clean (its hunks don't touch the branch's
+  `boost::filesystem` fix). Hand-resolved: `.gitignore` (kept both sides +
+  `src/test-phoenix413` for the Mac harness binary), `src/clientversion.h`
+  (0 → **2**, `IS_RELEASE false`), Technical Changelog (took the §2.4 body +
+  Phoenix table row only — dev's Aug doc-hygiene rows reference sections this
+  branch's copy doesn't have).
+- **Vector harness — PASS 45/45 on BOTH arches** (consensus code proven bit-exact):
+  arm64: `clang++ -O2 -I/opt/homebrew/opt/openssl@3/include src/test-phoenix413.cpp -L/opt/homebrew/opt/openssl@3/lib -lcrypto`
+  x86_64: same under `arch -x86_64` against `/usr/local/opt/openssl@3`.
+- **x64 tree cleaned up:** it had sat on `dev` with the May macOS patches as
+  *uncommitted* edits. Those were stashed (`git stash list` — "pre-phoenix413 x64
+  tree state"), the tree checked out to `macos-v1.5.0`/`fb94a58`, and the one
+  deliberate local edit re-applied: the `sed` in `src/makefile.osx`
+  (`/opt/homebrew`→`/usr/local`, `-arch arm64`→`-arch x86_64`). Six stale
+  untracked files (now tracked on the branch) were moved to the session scratchpad.
+- **Rebuilt + repackaged** via the "code-only patch" workflow below: make in both
+  trees, `macdeployqt` on each per-arch bundle, lipo-merge of just the executable
+  into `Blazecoin-Qt-universal/`, ad-hoc re-sign, binary swapped into
+  `/Applications/Blazecoin V1.5.app`.
+- **Validated:** reports `v1.5.2.0-g55c5572-beta (2026-08-26 …)` in debug.log
+  (the `g55c5572` is the upstream's hard-coded fallback in `src/version.cpp:40` —
+  `git describe` finds no annotated tags; all platforms report it), resumed sync
+  from the May chainstate (~99.8% → tip), clean quit (`Shutdown : done`, no new
+  crash log). Send/receive not re-tested: the change is consensus-inert
+  (`PHOENIX_ACTIVATION_HEIGHT = 0x7fffffff`) and those paths were validated in May.
+- **`build/build.h` gotcha:** genbuild only rewrites it when the BUILD_DESC line
+  changes, so `BUILD_DATE` had been stuck at 2026-05-08. `rm build/build.h` +
+  `make` re-stamps it.
+
+**When the activation height H_A is ratified** (per `PHOENIX_413.md` in
+`Blazecoin_Wallet_V2_Core`; sequenced after Halving IV and the 2026-09-07
+migration), the macOS V1.5.2 release is:
+1. Set `PHOENIX_ACTIVATION_HEIGHT` in `src/main.cpp` to H_A (same height as the
+   V2 daemon + lite wallets).
+2. Add the checkpoint at/near H_A that spec §4 requires (`src/checkpoints.cpp`).
+3. Flip `CLIENT_VERSION_IS_RELEASE` to `true`.
+4. `rm build/build.h`, rebuild both trees, macdeployqt each, lipo, re-sign
+   (workflow below), re-run the pre-release validation checklist, zip + SHA-256,
+   publish `v1.5.2-macos` in lockstep with the other platforms.
+
+---
+
 ## Session checkpoint (2026-05-13)
 
 When picking this back up:
