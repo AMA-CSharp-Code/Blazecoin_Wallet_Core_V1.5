@@ -56,6 +56,23 @@ was cherry-picked onto `macos-v1.5.0` as `fb94a58`, built, and installed.
   changes, so `BUILD_DATE` had been stuck at 2026-05-08. `rm build/build.h` +
   `make` re-stamps it.
 
+**ACTIVATION (same day, 2026-08-26 evening): H_A = 4,194,000 SET AND BUILT.**
+Andrew accelerated activation because the chain is difficulty-stranded — the
+network tip was **4,193,990** (confirmed via both seed nodes' version handshake)
+when H_A was chosen, i.e. the fork block is hours away. Commit `f017836`:
+`PHOENIX_ACTIVATION_HEIGHT = 4194000`, `CLIENT_VERSION_IS_RELEASE = true`.
+Both arches rebuilt, lipo-merged, signed, installed to `/Applications`;
+`getinfo` reports 1050200. Transfer zip for the Intel Mac:
+`~/Blazecoin-V1.5.2-macOS-universal.zip` (sha256 `b2d9686c…d008668`).
+New operator nodes added to `blazecoin.conf`: `addnode=54.39.23.245:55414`,
+`addnode=51.210.47.141:55414` (both verified listening; the two 2014 seeds
+freeze at the fork by design). Note: the `-beta` version suffix is hard-coded
+unconditionally in `src/version.cpp:15` on all platforms — not an IS_RELEASE bug.
+Still owed post-fork: checkpoint at/near H_A once buried (spec §4), fork-day
+comms, and the same H_A in the V2 daemon + lite heads BEFORE block 4,194,000.
+
+*(The original pre-activation recipe below is kept for reference.)*
+
 **When the activation height H_A is ratified** (per `PHOENIX_413.md` in
 `Blazecoin_Wallet_V2_Core`; sequenced after Halving IV and the 2026-09-07
 migration), the macOS V1.5.2 release is:
