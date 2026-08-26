@@ -17,8 +17,8 @@
 
 #ifdef USE_QRCODE
 #include "qrcodedialog.h"
-#include "message_box_dialog.h"
 #endif
+#include "message_box_dialog.h"
 
 AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     QDialog(parent),
