@@ -12,6 +12,7 @@
 #include "ui_interface.h"
 #include "checkqueue.h"
 #include "checkpointsync.h"
+#include "phoenix413.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -52,6 +53,15 @@ unsigned int nCoinCacheSize = 5000;
 static const int64 nDiffChangeTarget = 600000;
 static const int64 patchBlockRewardDuration = 20160;
 static const int nSoftFork = 1316550;
+
+// Phoenix-413 (per-block ASERT retarget, RATIFIED 2026-08-26 — spec:
+// PHOENIX_413.md in Blazecoin_Wallet_V2_Core). Era 3 of the difficulty rule.
+// ⚠️ PLACEHOLDER: 0x7fffffff = never active. The activation release (V1.5.2
+// final) sets this to the network-wide H_A chosen per the spec — the SAME
+// height the V2 daemon and the lite wallets activate at. Blocks at height
+// > PHOENIX_ACTIVATION_HEIGHT use Phoenix-413; blocks at <= H_A keep the
+// historical Era-1/Era-2 rules unchanged.
+static const int PHOENIX_ACTIVATION_HEIGHT = 0x7fffffff;
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
 int64 CTransaction::nMinTxFee = 100000;
@@ -1122,12 +1132,44 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
     return bnResult.GetCompact();
 }
 
+// Phoenix-413 (Era 3): per-block ASERT for every block above the activation
+// height. The anchor is block H_A itself — its nBits (the last Era-2 target)
+// and its parent's timestamp. The anchor is cached after the first lookup:
+// it is a constant once H_A exists, and the activation release also ships a
+// checkpoint at/near H_A (spec §4), which makes a reorg across the fork
+// height impossible and the cache therefore safe.
+unsigned int static GetNextWorkRequiredPhoenix(const CBlockIndex* pindexLast)
+{
+    static unsigned int nAnchorBits = 0;
+    static int64 nAnchorParentTime = 0;
+    if (nAnchorBits == 0)
+    {
+        const CBlockIndex* pindex = pindexLast;
+        while (pindex->pprev && pindex->nHeight > PHOENIX_ACTIVATION_HEIGHT)
+            pindex = pindex->pprev;
+        assert(pindex->nHeight == PHOENIX_ACTIVATION_HEIGHT && pindex->pprev);
+        nAnchorBits = pindex->nBits;
+        nAnchorParentTime = pindex->pprev->GetBlockTime();
+    }
+    return Phoenix413_NextCompact(nAnchorBits, nAnchorParentTime,
+                                  PHOENIX_ACTIVATION_HEIGHT,
+                                  pindexLast->nHeight + 1,
+                                  pindexLast->GetBlockTime());
+}
+
 unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
     unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
 
 
 	int nHeight = pindexLast->nHeight + 1;
+
+    // Era 3 — Phoenix-413 (mainnet only; inert while the placeholder height
+    // is 0x7fffffff). Everything below this line is the historical rule set,
+    // byte-identical for all blocks at or below the activation height.
+    if (!fTestNet && nHeight > PHOENIX_ACTIVATION_HEIGHT)
+        return GetNextWorkRequiredPhoenix(pindexLast);
+
     bool fNewDifficultyProtocol = (nHeight >= nDiffChangeTarget || fTestNet);
     int blockstogoback = 0;
     //set default to pre-v6.4.3 patch values
