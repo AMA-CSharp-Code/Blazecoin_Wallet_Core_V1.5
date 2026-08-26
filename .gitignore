@@ -84,3 +84,5 @@ desktop.ini
 .idea/
 
 msbuild*.log
+test-phoenix413.exe
+test-phoenix413.obj

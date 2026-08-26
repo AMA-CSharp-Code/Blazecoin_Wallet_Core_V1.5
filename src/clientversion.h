@@ -8,11 +8,13 @@
 // These need to be macros, as version.cpp's and blazecoin-qt.rc's voodoo requires it
 #define CLIENT_VERSION_MAJOR       1
 #define CLIENT_VERSION_MINOR       5
-#define CLIENT_VERSION_REVISION    1
+#define CLIENT_VERSION_REVISION    2
 #define CLIENT_VERSION_BUILD       0
 
 // Set to true for release, false for prerelease or test build
-#define CLIENT_VERSION_IS_RELEASE  true
+// (1.5.2 stays prerelease until the Phoenix-413 activation height is set —
+//  see PHOENIX_ACTIVATION_HEIGHT in main.cpp)
+#define CLIENT_VERSION_IS_RELEASE  false
 
 // Copyright year (2009-this)
 // Todo: update this when changing our copyright comments in the source
