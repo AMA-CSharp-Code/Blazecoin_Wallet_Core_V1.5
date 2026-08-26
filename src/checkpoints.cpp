@@ -52,6 +52,8 @@ namespace Checkpoints
             ( 3000000,  uint256("0x1af43523e055656cae5e3b6894d4484b968c25ddf7adbd758e5908e45e38fdf0"))
             ( 3500000,  uint256("0xf637143b959c511cd0e4d3df7859181f1e5633ca2460f270eb02d4903846e04f"))
             ( 4000000,  uint256("0x959ec2a6d7d67cf4272bcb6508c68daa69a7c280123f26d001c47387186fc1fd"))
+            // Phoenix-413 anchor (H_A, last Era-2 block, 2026-08-26)
+            ( 4194000,  uint256("0xadd35fb660b3424e73ffccddee2ac84933b92b75e99f0fe874605b716f8a96a0"))
             ;
     static const CCheckpointData data = {
         &mapCheckpoints,
