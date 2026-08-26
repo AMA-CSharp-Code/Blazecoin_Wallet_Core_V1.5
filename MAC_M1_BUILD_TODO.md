@@ -68,6 +68,9 @@ New operator nodes added to `blazecoin.conf`: `addnode=54.39.23.245:55414`,
 `addnode=51.210.47.141:55414` (both verified listening; the two 2014 seeds
 freeze at the fork by design). Note: the `-beta` version suffix is hard-coded
 unconditionally in `src/version.cpp:15` on all platforms — not an IS_RELEASE bug.
+**GitHub release PUBLISHED (2026-08-26): `v1.5.2-macos.1`** — marked Latest,
+universal zip + SHA-256 attached, mandatory-update notice + new addnodes in the
+notes. https://github.com/AMA-CSharp-Code/Blazecoin_Wallet_Core_V1.5/releases/tag/v1.5.2-macos.1
 Still owed post-fork: checkpoint at/near H_A once buried (spec §4), fork-day
 comms, and the same H_A in the V2 daemon + lite heads BEFORE block 4,194,000.
 
