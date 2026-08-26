@@ -56,12 +56,13 @@ static const int nSoftFork = 1316550;
 
 // Phoenix-413 (per-block ASERT retarget, RATIFIED 2026-08-26 — spec:
 // PHOENIX_413.md in Blazecoin_Wallet_V2_Core). Era 3 of the difficulty rule.
-// ⚠️ PLACEHOLDER: 0x7fffffff = never active. The activation release (V1.5.2
-// final) sets this to the network-wide H_A chosen per the spec — the SAME
-// height the V2 daemon and the lite wallets activate at. Blocks at height
-// > PHOENIX_ACTIVATION_HEIGHT use Phoenix-413; blocks at <= H_A keep the
-// historical Era-1/Era-2 rules unchanged.
-static const int PHOENIX_ACTIVATION_HEIGHT = 0x7fffffff;
+// H_A = 4,194,000 — set 2026-08-26 (network tip was 4,193,990 at the time;
+// the chain was difficulty-stranded and Phoenix-413 is the recovery). This
+// value is consensus-critical and MUST be identical in the V2 daemon and the
+// lite-wallet verifiers. Blocks at height > PHOENIX_ACTIVATION_HEIGHT use
+// Phoenix-413; blocks at <= H_A keep the historical Era-1/Era-2 rules
+// unchanged. Anchor: block H_A's nBits + the timestamp of block H_A − 1.
+static const int PHOENIX_ACTIVATION_HEIGHT = 4194000;
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
 int64 CTransaction::nMinTxFee = 100000;

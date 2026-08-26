@@ -12,9 +12,7 @@
 #define CLIENT_VERSION_BUILD       0
 
 // Set to true for release, false for prerelease or test build
-// (1.5.2 stays prerelease until the Phoenix-413 activation height is set —
-//  see PHOENIX_ACTIVATION_HEIGHT in main.cpp)
-#define CLIENT_VERSION_IS_RELEASE  false
+#define CLIENT_VERSION_IS_RELEASE  true
 
 // Copyright year (2009-this)
 // Todo: update this when changing our copyright comments in the source
