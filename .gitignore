@@ -90,3 +90,8 @@ src/test_blazecoin
 src/leveldb/libleveldb.a
 src/leveldb/libmemenv.a
 build/
+
+msbuild*.log
+test-phoenix413.exe
+test-phoenix413.obj
+src/test-phoenix413
