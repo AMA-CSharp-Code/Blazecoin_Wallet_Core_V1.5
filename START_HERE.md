@@ -54,9 +54,9 @@ cd C:\path\to\source\repos\Blazecoin_Core_V1.5
 ### ✅ Your Code is Ready
 
 All V1.5 code modifications are complete and verified:
-- ✅ Version updated to 1.5.0.0
+- ✅ Version updated to 1.5.0.0 (tree now 1.5.2.0 — Phoenix-413, 2026-08-26)
 - ✅ Header limits increased to 50M
-- ✅ 16 checkpoints added (including critical 2M checkpoint)
+- ✅ 16 checkpoints added (including critical 2M checkpoint; 17 since the 4,194,000 Phoenix anchor, 2026-08-26)
 - ✅ All changes verified
 
 ---
