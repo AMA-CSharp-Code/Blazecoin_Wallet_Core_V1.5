@@ -1,6 +1,6 @@
 ﻿# Blazecoin V1.5 — Complete Changelog vs Original (0.8.6.2)
 
-**Generated:** 2026-04-24 — last updated 2026-08-24 (see the revision table; body sections lag the table for post-April work)
+**Generated:** 2026-04-24 — last updated 2026-09-10 (see the revision table; body sections lag the table for post-April work; §2.4 body re-trued to the activated state 2026-09-10)
 **Scope:** Every source-level change made to the Blazecoin codebase between the original wpstudio/blazecoin 0.8.6.2 release and the compiled, running V1.5 binary.
 **Validated against:** Production chain via sync test. Genesis hash matches; checkpoints 500K through 4M all match; daemon (blazecoind.exe) and GUI (blazecoin-qt.exe) both build cleanly on MSVC 2022 / Qt 5.15 / vcpkg.
 
@@ -58,7 +58,7 @@ V1.5 contains three distinct categories of change:
 | **Toolchain changes** | Make the 2013-era code compile under MSVC 2022 / OpenSSL 3.x / Boost 1.90; the original toolchain is no longer obtainable | Required extensive API migration; no functional changes |
 | **Latent bug fixes** | Fix pre-existing bugs in the original code that only surface in Release builds + OpenSSL 3.x | Repairs silently-broken behavior inherited from upstream |
 
-Consensus rules, wire protocol, `wallet.dat` format, P2P ports, and magic bytes are **unchanged**.
+Consensus rules, wire protocol, `wallet.dat` format, P2P ports, and magic bytes are **unchanged** — with one deliberate exception since v1.5.2: the **Phoenix-413** per-block retarget above block 4,194,000 (activated 2026-08-26, §2.4), the chain's first consensus change.
 
 ---
 
@@ -77,7 +77,7 @@ COPYRIGHT_YEAR 2013  →  2026
 
 Wallet now reports: `Blazecoin version v1.5.0.0-<commit>-beta`.
 *(Since the 1.5.1 release — `9889468` on `linux`, `ed3a0e8` on `dev` — `CLIENT_VERSION_REVISION` is
-`1`, so the current tree reports `v1.5.1.0-<commit>-beta`. Noted 2026-08-24.)*
+`1`, so the tree then reported `v1.5.1.0-<commit>-beta`. Noted 2026-08-24. Since the 1.5.2 release (2026-08-26) `CLIENT_VERSION_REVISION` is `2` and `IS_RELEASE` is `true`, so the tree reports `v1.5.2.0`.)*
 
 ### 2.2 Header-response cap raised (2,000 → 50,000,000 headers per reply)
 
@@ -102,7 +102,7 @@ The original 0.8.6.2 syncs without these and produces an identical canonical cha
 
 Full checkpoint list is in `Blazecoin_V1.5_Checkpoints.txt`.
 
-### 2.4 Phoenix-413 retarget (V1.5.2, added 2026-08-26 — INERT until the activation height is set)
+### 2.4 Phoenix-413 retarget (V1.5.2, added 2026-08-26 — ACTIVATED the same day at `H_A` = 4,194,000)
 
 **Files:** `src/phoenix413.h` (new), `src/main.cpp` (dispatch + anchor), `src/test-phoenix413.cpp` (new, harness only), `contrib/phoenix413/` (reference generator + canonical vectors), `src/phoenix413_vectors.h` (generated)
 
@@ -111,7 +111,7 @@ Blazecoin's first planned consensus change (**RATIFIED 2026-08-26**; spec of rec
 Mechanics in this codebase:
 - `src/phoenix413.h` is **self-contained** (raw OpenSSL `BN_*` only — no `util.h`/`CBigNum`), so the standalone harness compiles it in isolation. Its compact encode/decode is algorithm-identical to `CBigNum::SetCompact/GetCompact` for positive targets; its powLimit constant (2^236 − 1) is provably `bnProofOfWorkLimit` (`~uint256(0) >> 20`).
 - `GetNextWorkRequired` gains an Era-3 dispatch at the top (mainnet only): `nHeight > PHOENIX_ACTIVATION_HEIGHT` → `GetNextWorkRequiredPhoenix`, which walks once to block `H_A`, caches its `nBits` (the last Era-2 target) + its **parent's** timestamp as the anchor, and evaluates the absolute ASERT formula from there. All blocks ≤ `H_A` validate byte-identically to 1.5.1. The anchor cache is safe because the activation release also ships a checkpoint at/near `H_A` (no reorg across the fork height).
-- **`PHOENIX_ACTIVATION_HEIGHT` is `0x7fffffff` (never active) in this tree.** The V1.5.2 *final* release is cut only when the network-wide `H_A` is chosen (same height as the V2 daemon + lite wallets, ≥ 2 weeks after every implementation ships); it is a one-line change plus the checkpoint row.
+- **`PHOENIX_ACTIVATION_HEIGHT` is `4194000` in this tree** (`src/main.cpp`, set by `f017836`; `clientversion.h` = 1.5.2.0 with `IS_RELEASE true`). *(Body re-trued 2026-09-10 — until then this bullet still described the pre-activation `0x7fffffff` placeholder.)* The plan had been to cut the final only once the network-wide `H_A` was chosen; in the event the height was chosen and the release cut on 2026-08-26 (revision-table row above). ⚠️ The `v1.5.2-*` tags do **not** carry the 4,194,000 checkpoint row — see §12.
 - **Pinned semantics** (all implementations must match): C-truncating division for the exponent, arithmetic-shift floor for the integer part, two's-complement low 16 bits for the fraction, the aserti3-2d cubic, right-shift floors, zero→1, clamp to powLimit. `contrib/phoenix413/generate_phoenix_vectors.py` is the Python reference authority; **the harness passes all 45 vectors** (steady state, half-life boundaries, 13×/23×/100× strands, 2 h future-time abuse, both clamps, a 120-block LCG walk). `ComputeMinWork` needs no change (its 4×/4 h decay allowance is strictly more permissive than Phoenix's 2×/3.4 h).
 
 ---
@@ -494,7 +494,7 @@ Reproducible via `./bench-rpc-batch.sh [N]` from the repo root (defaults to N=10
 
 These are the invariants that let V1.5 interoperate with production nodes on the same network:
 
-- **Consensus rules** — block validity, PoW (scrypt), difficulty adjustment, reward halving schedule
+- **Consensus rules** — block validity, PoW (scrypt), difficulty adjustment (up to block 4,194,000; Phoenix-413 per-block ASERT above it since v1.5.2), reward halving schedule
 - **Wire / P2P protocol** — message format, magic bytes (`0xfb 0xc0 0xb6 0xdb`), protocol version 75000
 - **Transaction format** — `CTransaction` serialization, signature hashing, Merkle tree construction
 - **wallet.dat format** — Berkeley DB records, key derivation, encryption (AES-256-CBC)
@@ -503,7 +503,7 @@ These are the invariants that let V1.5 interoperate with production nodes on the
 - **Coinbase maturity** — 30 blocks
 - **Default ports** — RPC 55413, P2P 55414 (V1.5 test instance uses 55415/55416 to coexist with production)
 
-An existing production node will peer with V1.5 as if it were another 0.8.6.2 client.
+An existing production node will peer with V1.5 as if it were another 0.8.6.2 client — true up to `H_A` = 4,194,000; since Phoenix-413 (2026-08-26) a 0.8.6.2 or pre-1.5.2 node cannot follow the chain past that height.
 
 ---
 
@@ -574,6 +574,7 @@ The GUI defaults to `%APPDATA%\BlazecoinV1.5\` (see § 9.1).
 - **Long-term:** V2.0 should be an incremental Bitcoin Core rebase (e.g. 0.8 → 0.12 → 0.16 → 0.21 → 28.x) using V1.5 as the proven baseline rather than the failed jump-to-28.0 attempt. *(Superseded 2026-05-05: the direct jump-to-28.0 was unblocked by filling four chainparams TODOs in V2's `kernel/chainparams.cpp` — incremental rebase is no longer needed. See V2's `BLAZECOIN_V2.md` "Recent work" for the actual unblock path.)*
 - **Revert `src/main.cpp:2285` (`nStartingHeight - 50000000`) to the original `- 2000`** — the edit was a misread of the header-limit change (see §2.2); behaviourally a no-op today, but it is noise in the consensus-adjacent diff. *(Added 2026-08-22.)*
 - **Published-asset hashes vs the repo's local sums files (recorded 2026-08-22):** the GitHub `v1.5.0` asset `Blazecoin-V1.5.0-windows-x64.zip` is sha256 `7518b9fb0d2113ff03326e61c9dc9481c77a1c22d792ffb9ff50a8ebb0f6f68f` and the `blazecoin-qt.exe` inside it is `a06acd080c0229fd5c3bf34a1b90c29aa15f4974800d881bb3de1ce4c21dee70` (verified by downloading the asset). The gitignored `release/blazecoin-v1.5.0-windows-x64.sha256sums.txt` on this box lists `431c260e…` for `blazecoin-qt.exe` — a different local build, so trust the GitHub release digest, not that file. The local `release/blazecoin-v1.5.0-windows-x64.zip` beside it is a **third** artifact (sha256 `05286f26dc00ef1ac5efcbe12038e35e2408885e10e966fcce1b4a45bf7adb5d`, verified 2026-08-24) — neither the published asset nor anything any doc records; do not treat it as the release either. `v1.5.1` hashes (zip `92c16d0e…`, exe `8ba7ac15…`, daemon `c6058a01…`) agree across the release body, the bundle's `sha256sums.txt` and the Desktop extract.
+- 🚨 **The three `v1.5.2-*` tags do NOT contain the 4,194,000 checkpoint** that HEAD carries (`git grep 4194000 v1.5.2-windows -- src/checkpoints.cpp` is empty for `-windows`, `-linux` and `-macos.1`; found 2026-09-10). The §2.4 anchor-cache safety argument assumed it shipped. Decision owed: cut v1.5.3 with the checkpoint, or record that 1.5.2 relies on the anchor cache alone.
 - **Branch hygiene:** `macos-v1.5.0` (tag `v1.5.0-macos.1`) exists only on the `mine` remote — not merged, not fetched locally; `linux` carries six Wayland/high-DPI/icon commits `dev` lacks and `dev` carries the §13.22 Title Case sweep `linux` lacks (see the 2026-05-16 revision row). A release of 1.5.2 from either branch should first reconcile the two. *(Added 2026-08-22.)*
 
 ---
