@@ -171,7 +171,7 @@ If issues occur:
 | Version | Date | Changes |
 |---------|------|---------|
 | 0.8.6.2 | Current | Bitcoin/Litecoin fork, limits for <1M blocks |
-| **1.5.0.0** | 2026 (planned) | **Increased limits for 50M blocks, new checkpoints** |
+| **1.5.0.0** | 2026-05-04 (shipped; the line is at 1.5.2.0 since 2026-08-26) | **Increased limits for 50M blocks, new checkpoints** |
 
 ## Configuration Comparison
 
@@ -232,7 +232,7 @@ A: Not during testing (separate ports). Brief downtime needed for production dep
 
 ## Status Dashboard
 
-**Project Status:** 🟢 Ready to Begin
+**Project Status:** ✅ SHIPPED (1.5.0 → 1.5.2) — this planning doc is historical; see the correction banner at the top
 
 - [x] Documentation complete
 - [x] Tools created

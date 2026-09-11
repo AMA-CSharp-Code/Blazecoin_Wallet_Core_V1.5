@@ -151,7 +151,7 @@ Date: April 23, 2026
 
 ### Windows (MinGW)
 
-**Prerequisites:**
+**Prerequisites:** *(planning-era MinGW list — the SHIPPED build is MSVC 2022 + vcpkg: OpenSSL 3.x, Boost 1.90, BDB 4.8; see the Technical Changelog §11)*
 - MinGW with g++ compiler
 - OpenSSL 1.0.1c
 - Berkeley DB 4.8.30.NC
@@ -420,7 +420,7 @@ If issues occur during production deployment:
 ### Issue: Compilation Errors
 
 **Solution:** Ensure all dependencies are correct versions:
-- OpenSSL 1.0.1c (not newer versions)
+- OpenSSL 1.0.1c (not newer versions) *(MinGW-era advice — the shipped MSVC build is on OpenSSL 3.x)*
 - Berkeley DB 4.8.30.NC (exactly this version)
 - Boost 1.50.0
 - miniupnpc 1.6
