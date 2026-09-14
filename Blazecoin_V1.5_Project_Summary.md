@@ -232,7 +232,7 @@ A: Not during testing (separate ports). Brief downtime needed for production dep
 
 ## Status Dashboard
 
-**Project Status:** ✅ SHIPPED (1.5.0 → 1.5.2) — this planning doc is historical; see the correction banner at the top
+**Project Status:** ✅ SHIPPED (1.5.0 → 1.5.3) — this planning doc is historical; see the correction banner at the top
 
 - [x] Documentation complete
 - [x] Tools created

@@ -1,7 +1,7 @@
 > ⚠️ **Network notice (2026-08-26): run v1.5.2 or later.** Since block **4,194,000** the Blazecoin chain uses the
 > **Phoenix-413** per-block difficulty retarget (spec: `PHOENIX_413.md` in the V2 repo; V1.5 implementation in
 > `src/phoenix413.h`, §2.4 of `Blazecoin_V1.5_Technical_Changelog.md`). Older builds — including the original 2014
-> 0.8.6.2 client and V1.5.0/1.5.1 — stop at that height. Releases: tags `v1.5.2-windows`, `v1.5.2-linux`, `v1.5.2-macos.1`. **v1.5.3 (this tree, 2026-09-14): bakes the block-4,194,000 checkpoint into the binaries** (the v1.5.2 tags were cut
+> 0.8.6.2 client and V1.5.0/1.5.1 — stop at that height. Releases: tags `v1.5.3-windows`, `v1.5.3-linux` (2026-09-14; macOS stays on `v1.5.2-macos.1` until an on-Mac build). **v1.5.3 bakes the block-4,194,000 checkpoint into the binaries** (the v1.5.2 tags were cut
 > before that commit; nothing else changes). ⚠️ **Sunset notice:** the chain's NEXT consensus change — the post-quantum
 > output type specified in `PQ_SIGNATURES.md` (V2 repo; decisions ratified 2026-09-14, activation height to be announced
 > months ahead) — will **not** be implemented in V1.5: its 0.8.6.2 script engine cannot carry it. At that height V1.5 stops
