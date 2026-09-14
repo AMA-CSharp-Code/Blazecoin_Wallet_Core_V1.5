@@ -171,7 +171,7 @@ If issues occur:
 | Version | Date | Changes |
 |---------|------|---------|
 | 0.8.6.2 | Current | Bitcoin/Litecoin fork, limits for <1M blocks |
-| **1.5.0.0** | 2026-05-04 (shipped; the line is at 1.5.2.0 since 2026-08-26) | **Increased limits for 50M blocks, new checkpoints** |
+| **1.5.0.0** | 2026-05-04 (shipped; the line is at 1.5.3.0 since 2026-09-14 — checkpoint release + V1.5 sunset notice) | **Increased limits for 50M blocks, new checkpoints** |
 
 ## Configuration Comparison
 
